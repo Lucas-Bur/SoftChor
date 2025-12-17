@@ -27,7 +27,7 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
       const match = document.cookie.match(
-        new RegExp('(^| )' + THEME_UI_KEY + '=([^;]+)'),
+        new RegExp(`(^| )${THEME_UI_KEY}=([^;]+)`),
       )
       return (match ? match[2] : defaultTheme) as Theme
     }
