@@ -5,10 +5,11 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { usersCollection } from '@/db-collections'
 
-export const Route = createFileRoute('/demo')({
+export const Route = createFileRoute('/_authenticated/demo')({
   component: DemoDrizzle,
   loader: async () => {
-    // Vorladen der Daten (SSR friendly)
+    // loader zeiht auch erst, wenn man wirklich erst, wenn man beforeLoad von der auth Route bestanden hat!
+    // Vorladen der Daten
     await usersCollection.preload()
   },
   ssr: 'data-only',

@@ -11,8 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as DemoRouteImport } from './routes/demo'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedDemoRouteImport } from './routes/_authenticated/demo'
 import { Route as ApiSyncSplatRouteImport } from './routes/api/sync.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 
@@ -26,15 +27,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoRoute = DemoRouteImport.update({
-  id: '/demo',
-  path: '/demo',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDemoRoute = AuthenticatedDemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const ApiSyncSplatRoute = ApiSyncSplatRouteImport.update({
   id: '/api/sync/$',
@@ -49,26 +54,27 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/demo': typeof DemoRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/demo': typeof AuthenticatedDemoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/sync/$': typeof ApiSyncSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/demo': typeof DemoRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/demo': typeof AuthenticatedDemoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/sync/$': typeof ApiSyncSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/demo': typeof DemoRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/_authenticated/demo': typeof AuthenticatedDemoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/sync/$': typeof ApiSyncSplatRoute
 }
@@ -76,26 +82,27 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/demo'
     | '/login'
     | '/profile'
+    | '/demo'
     | '/api/auth/$'
     | '/api/sync/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo' | '/login' | '/profile' | '/api/auth/$' | '/api/sync/$'
+  to: '/' | '/login' | '/profile' | '/demo' | '/api/auth/$' | '/api/sync/$'
   id:
     | '__root__'
     | '/'
-    | '/demo'
+    | '/_authenticated'
     | '/login'
     | '/profile'
+    | '/_authenticated/demo'
     | '/api/auth/$'
     | '/api/sync/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DemoRoute: typeof DemoRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -118,11 +125,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo': {
-      id: '/demo'
-      path: '/demo'
-      fullPath: '/demo'
-      preLoaderRoute: typeof DemoRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -131,6 +138,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/demo': {
+      id: '/_authenticated/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof AuthenticatedDemoRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/api/sync/$': {
       id: '/api/sync/$'
@@ -149,9 +163,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedDemoRoute: typeof AuthenticatedDemoRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDemoRoute: AuthenticatedDemoRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DemoRoute: DemoRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

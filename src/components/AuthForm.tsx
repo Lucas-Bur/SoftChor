@@ -34,7 +34,11 @@ import {
   registerSchema,
 } from '@/lib/auth-schema'
 
-export function AuthForm() {
+type AuthFormProps = {
+  redirectTo: string
+}
+
+export function AuthForm({ redirectTo }: AuthFormProps) {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -58,7 +62,7 @@ export function AuthForm() {
         password: data.password,
         fetchOptions: {
           onSuccess: () => {
-            navigate({ to: '/profile' })
+            navigate({ to: redirectTo })
           },
           onError: (ctx) => {
             // Hier Fehlerbehandlung, z.B. Toast
@@ -81,7 +85,7 @@ export function AuthForm() {
         name: data.name,
         fetchOptions: {
           onSuccess: () => {
-            navigate({ to: '/profile' })
+            navigate({ to: redirectTo })
           },
           onError: (ctx) => {
             console.error(ctx.error.message)
