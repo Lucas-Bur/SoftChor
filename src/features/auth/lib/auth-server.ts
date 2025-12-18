@@ -7,13 +7,14 @@ import * as schema from '@/db/schema'
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
-    schema: schema,
+    schema,
     transaction: true,
+    usePlural: true,
   }),
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
   },
-  experimental: { joins: true },
+  // experimental: { joins: true },
   plugins: [tanstackStartCookies()],
 })

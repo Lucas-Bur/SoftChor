@@ -15,6 +15,13 @@
       "when": 1765478057561,
       "tag": "0001_overjoyed_manta",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766087286843,
+      "tag": "0002_amazing_raider",
+      "breakpoints": true
     }
   ]
 }

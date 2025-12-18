@@ -26,16 +26,16 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/motion-tabs'
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/features/auth/lib/auth-client'
 import {
   type LoginInput,
   loginSchema,
   type RegisterInput,
   registerSchema,
-} from '@/lib/auth-schema'
+} from '@/features/auth/lib/auth-schema'
 
 type AuthFormProps = {
-  redirectTo: string
+  redirectTo: string | undefined
 }
 
 export function AuthForm({ redirectTo }: AuthFormProps) {
@@ -62,6 +62,7 @@ export function AuthForm({ redirectTo }: AuthFormProps) {
         password: data.password,
         fetchOptions: {
           onSuccess: () => {
+            if (!redirectTo) navigate({ to: '/' })
             navigate({ to: redirectTo })
           },
           onError: (ctx) => {
@@ -100,7 +101,7 @@ export function AuthForm({ redirectTo }: AuthFormProps) {
 
   return (
     <div className='flex min-h-[50vh] items-start justify-center p-4 pt-14'>
-      <Tabs defaultValue='login' className='w-[400px]'>
+      <Tabs defaultValue='login' className='w-100'>
         <TabsList className='grid w-full grid-cols-2'>
           <TabsTrigger value='login'>Anmelden</TabsTrigger>
           <TabsTrigger value='register'>Registrieren</TabsTrigger>

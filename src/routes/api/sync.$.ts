@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { auth } from '@/lib/auth-server' // Dein Auth Server Import
+import { auth } from '@/features/auth/lib/auth-server' // Dein Auth Server Import
 import { isAllowedTable } from '@/lib/electric-helpers'
 import { prepareElectricUrl, proxyElectricRequest } from '@/lib/electric-proxy'
 

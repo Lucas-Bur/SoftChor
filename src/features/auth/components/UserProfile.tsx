@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { authClient } from '@/lib/auth-client'
+import { authClient } from '@/features/auth/lib/auth-client'
 
 export function UserProfile() {
   const { data: session } = authClient.useSession()

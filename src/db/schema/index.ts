@@ -1,9 +1,9 @@
 import { getTableName } from 'drizzle-orm'
 
-import { authSync } from './auth'
+import { authSync } from '@/features/auth/db/schema'
 import { postsSync } from './posts'
 
-export * from './auth'
+export * from '@/features/auth/db/schema'
 export * from './posts'
 
 const ALL_SYNCABLE = [...authSync, ...postsSync] as const

@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Layers } from 'lucide-react'
+import { UserMenu } from '@/features/auth/components/UserMenu'
 import { ModeToggle } from './ModeToggle'
-import { UserMenu } from './UserMenu'
 
 export function Header() {
   return (
