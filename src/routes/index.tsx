@@ -28,7 +28,7 @@ function LandingPage() {
           <h1 className='text-5xl md:text-7xl font-bold tracking-tight mb-8'>
             <span className='text-foreground'>Local First.</span>
             <br />
-            <span className='text-transparent bg-clip-text bg-gradient-to-r from-primary via-cyan-400 to-purple-500 animate-text-glow'>
+            <span className='text-transparent bg-clip-text bg-linear-to-r from-primary via-cyan-400 to-purple-500 animate-text-glow'>
               Global Sync.
             </span>
           </h1>
