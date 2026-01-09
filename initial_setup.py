@@ -1,9 +1,5 @@
 from homr import main as homr_main_file
 
-# Define default configurations
-config = homr_main_file.ProcessingConfig(False, False, False, False, -1)
-xml_generator_args = homr_main_file.XmlGeneratorArguments(False, False, False)
-
 
 def main():
     print("This is the initial setup script.")
