@@ -1,9 +1,17 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Repertoire } from '@/features/scores/components/Repertoire'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { MusicBar } from '@/features/scores/components/MusicBar'
+import { SongProvider } from '@/features/scores/context/SongContext'
 import { songsCollection } from '@/features/scores/db/collections'
 
 export const Route = createFileRoute('/_authenticated/scores')({
-  component: Repertoire,
+  component: () => (
+    <SongProvider>
+      <div className='flex flex-col'>
+        <Outlet />
+        <MusicBar />
+      </div>
+    </SongProvider>
+  ),
   loader: async () => {
     await songsCollection.preload()
   },

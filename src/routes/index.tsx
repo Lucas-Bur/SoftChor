@@ -8,6 +8,7 @@ import {
   Fingerprint,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { enqueueSongProcessing } from '@/features/queue/services/queue'
 
 export const Route = createFileRoute('/')({ component: LandingPage })
 
@@ -57,6 +58,19 @@ function LandingPage() {
               <a href='#analysis'>Die Analyse lesen</a>
             </Button>
           </div>
+          <Button
+            variant='outline'
+            size='lg'
+            className='h-12 px-8 text-base backdrop-blur-sm bg-background/30'
+            onClick={async () => {
+              const res = await enqueueSongProcessing({
+                data: { jobId: '09b11d0b-05a3-4ce3-9a8d-840034c1223c' },
+              })
+              console.log(res)
+            }}
+          >
+            Hier testen
+          </Button>
         </div>
       </section>
 

@@ -5,13 +5,17 @@ import { createServerFn } from '@tanstack/react-start'
 import { getTableName } from 'drizzle-orm'
 import { db } from '@/db'
 import {
+  files,
   insertSongsSchema,
+  selectFilesSchema,
   selectSongsSchema,
+  selectVoicesSchema,
   songs,
+  voices,
 } from '@/features/scores/db/schema'
 import { generateTxId, syncEndpointUrl } from '@/lib/utils'
 
-const addSong = createServerFn({
+export const addSong = createServerFn({
   method: 'POST',
 })
   .inputValidator(insertSongsSchema)
@@ -63,4 +67,44 @@ export const songsCollection = createCollection(
   }),
 )
 
-// Hier kommen noch analog die anderen Collections hin
+export const filesCollection = createCollection(
+  electricCollectionOptions({
+    id: 'files',
+    shapeOptions: {
+      url: syncEndpointUrl,
+      params: {
+        table: getTableName(files),
+      },
+      onError: (error) => {
+        console.error('Stream error:', error)
+        if (error instanceof FetchError && error.status >= 500) {
+          return {} // Retry with same params
+        }
+        // Return void to stop on other errors
+      },
+    },
+    schema: selectFilesSchema,
+    getKey: (item) => item.id,
+  }),
+)
+
+export const voicesCollection = createCollection(
+  electricCollectionOptions({
+    id: 'voices',
+    shapeOptions: {
+      url: syncEndpointUrl,
+      params: {
+        table: getTableName(voices),
+      },
+      onError: (error) => {
+        console.error('Stream error:', error)
+        if (error instanceof FetchError && error.status >= 500) {
+          return {} // Retry with same params
+        }
+        // Return void to stop on other errors
+      },
+    },
+    schema: selectVoicesSchema,
+    getKey: (item) => item.id,
+  }),
+)
