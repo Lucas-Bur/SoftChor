@@ -5,14 +5,34 @@ import {
   ArrowLeft,
   Calendar,
   Clock,
+  Download,
   FileText,
   Music2,
+  Trash2,
+  Upload,
 } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { enqueueSongProcessing } from '@/features/queue/services/queue'
+import {
+  deleteFileFn,
+  deleteFileFromDbFn,
+  getPresignedUrlsFromKeys,
+} from '@/features/s3/services/storage'
+import { FileUploadDialog } from '@/features/scores/components/FileUploadDialog'
 import { StatusBadge } from '@/features/scores/components/StatusBadge'
 import { useSongContext } from '@/features/scores/context/SongContext'
 import {
@@ -24,10 +44,9 @@ import type { SongFile, SongVoice } from '@/features/scores/db/schema'
 
 function FileTypeBadge({ fileType }: { fileType: SongFile['fileType'] }) {
   const fileTypeLabels: Record<SongFile['fileType'], string> = {
-    ORIGINAL_PDF: 'PDF',
+    SCORE: 'SCORE',
     MUSIC_XML: 'XML',
-    FULL_MP3: 'MP3',
-    VOICE_MP3: 'VOICE',
+    AUDIO: 'AUDIO',
   }
 
   return (
@@ -70,6 +89,47 @@ function VoiceTypeBadge({ voiceType }: { voiceType: SongVoice['voiceType'] }) {
   )
 }
 
+function FileItem({
+  file,
+  onDownload,
+  onDelete,
+  onProcess,
+}: {
+  file: SongFile
+  onDownload: (file: SongFile) => void
+  onDelete: () => void
+  onProcess?: () => void
+}) {
+  return (
+    <div className='flex items-center justify-between p-2 rounded-lg bg-muted/50'>
+      <div className='flex items-center gap-3'>
+        <FileTypeBadge fileType={file.fileType} />
+        <span className='text-sm font-medium'>
+          {file.originalName || file.s3Key}
+        </span>
+      </div>
+      <div className='flex items-center gap-2'>
+        {file.sizeBytes && (
+          <span className='text-sm text-muted-foreground'>
+            {(Number(file.sizeBytes) / 1024 / 1024).toFixed(2)} MB
+          </span>
+        )}
+        {onProcess && (
+          <Button variant='outline' size='sm' onClick={onProcess}>
+            Process
+          </Button>
+        )}
+        <Button variant='ghost' size='icon' onClick={() => onDownload(file)}>
+          <Download className='h-4 w-4' />
+        </Button>
+        <Button variant='ghost' size='icon' onClick={onDelete}>
+          <Trash2 className='h-4 w-4' />
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 export function SongDetail() {
   const { songId } = useParams({ from: '/_authenticated/scores/$songId' })
   const { setSelectedSongId, setSongTitle } = useSongContext()
@@ -90,6 +150,8 @@ export function SongDetail() {
   const songFiles = files.filter((f) => f.songId === songId)
   const songVoices = voices.filter((v) => v.songId === songId)
 
+  const [deleteFile, setDeleteFile] = useState<SongFile | null>(null)
+
   // Set the song as selected when this component mounts
   useEffect(() => {
     if (song) {
@@ -97,6 +159,58 @@ export function SongDetail() {
       setSongTitle(song.title)
     }
   }, [song, setSelectedSongId, setSongTitle])
+
+  const handleDownload = async (file: SongFile) => {
+    try {
+      const urls = await getPresignedUrlsFromKeys({
+        data: { keys: [file.s3Key] },
+      })
+      const url = urls.find((u) => u.key === file.s3Key)?.url
+      if (url) {
+        window.open(url, '_blank')
+      } else {
+        toast.error('Download URL not available')
+      }
+    } catch (error) {
+      console.error('Download failed:', error)
+      toast.error('Failed to download file')
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!deleteFile) return
+
+    try {
+      await deleteFileFn({ data: { key: deleteFile.s3Key } })
+      // Delete from DB
+      await deleteFileFromDbFn({ data: { id: deleteFile.id } })
+      toast.success('File deleted successfully')
+      setDeleteFile(null)
+    } catch (error) {
+      console.error('Delete failed:', error)
+      toast.error('Failed to delete file')
+    }
+  }
+
+  const handleProcessFile = async (
+    file: SongFile,
+    taskType: 'generate_xml_from_input' | 'generate_voices_from_xml',
+  ) => {
+    try {
+      // Send message to queue with specific file
+      await enqueueSongProcessing({
+        data: {
+          jobId: songId,
+          taskType,
+          taskParams: { inputKey: file.s3Key },
+        },
+      })
+      toast.success('Processing started')
+    } catch (error) {
+      console.error('Failed to start processing:', error)
+      toast.error('Failed to start processing')
+    }
+  }
 
   if (!song) {
     return (
@@ -205,6 +319,14 @@ export function SongDetail() {
                 )}
               </div>
 
+              {song.status === 'PROCESSING' && (
+                <div className='space-y-2'>
+                  <p className='text-sm text-muted-foreground'>Fortschritt</p>
+                  <Progress value={song.progress || 0} />
+                  <p className='text-sm text-center'>{song.progress ?? 0}%</p>
+                </div>
+              )}
+
               {song.errorMessage && (
                 <div className='p-4 bg-destructive/10 border border-destructive/20 rounded-lg space-y-2'>
                   <div className='flex items-center gap-2 text-destructive font-semibold'>
@@ -222,39 +344,118 @@ export function SongDetail() {
           {/* Files Section */}
           <Card>
             <CardHeader>
-              <CardTitle className='text-lg flex items-center gap-2'>
-                <FileText className='h-5 w-5 text-primary' />
-                Dateien
+              <CardTitle className='text-lg flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
+                  <FileText className='h-5 w-5 text-primary' />
+                  Dateien
+                </div>
+                <FileUploadDialog songId={songId}>
+                  <Button size='sm' variant='outline'>
+                    <Upload className='h-4 w-4 mr-2' />
+                    Upload
+                  </Button>
+                </FileUploadDialog>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className='space-y-2'>
-                {songFiles.length > 0 ? (
-                  songFiles.map((file) => (
-                    <div
-                      key={file.id}
-                      className='flex items-center justify-between p-3 rounded-lg bg-muted/50'
-                    >
-                      <div className='flex items-center gap-3'>
-                        <FileTypeBadge fileType={file.fileType} />
-                        <span className='text-sm font-medium'>
-                          {file.fileType.replace('_', ' ')}
-                        </span>
-                      </div>
-                      <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                        {file.sizeBytes && (
-                          <span>
-                            {(file.sizeBytes / 1024 / 1024).toFixed(2)} MB
+              <div className='space-y-4'>
+                {/* Scores */}
+                <div>
+                  <h4 className='text-sm font-medium mb-2'>Scores</h4>
+                  <div className='space-y-2'>
+                    {songFiles
+                      .filter((f) => f.fileType === 'SCORE')
+                      .map((file) => (
+                        <FileItem
+                          key={file.id}
+                          file={file}
+                          onDownload={handleDownload}
+                          onDelete={() => setDeleteFile(file)}
+                          onProcess={() =>
+                            handleProcessFile(file, 'generate_xml_from_input')
+                          }
+                        />
+                      ))}
+                    {songFiles.filter((f) => f.fileType === 'SCORE').length ===
+                      0 && (
+                      <p className='text-sm text-muted-foreground'>
+                        Keine Scores vorhanden
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* MusicXML */}
+                <div>
+                  <h4 className='text-sm font-medium mb-2'>MusicXML</h4>
+                  <div className='space-y-2'>
+                    {songFiles
+                      .filter((f) => f.fileType === 'MUSIC_XML')
+                      .map((file) => (
+                        <FileItem
+                          key={file.id}
+                          file={file}
+                          onDownload={handleDownload}
+                          onDelete={() => setDeleteFile(file)}
+                          onProcess={() =>
+                            handleProcessFile(file, 'generate_voices_from_xml')
+                          }
+                        />
+                      ))}
+                    {songFiles.filter((f) => f.fileType === 'MUSIC_XML')
+                      .length === 0 && (
+                      <p className='text-sm text-muted-foreground'>
+                        Keine MusicXML vorhanden
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Audio */}
+                <div>
+                  <h4 className='text-sm font-medium mb-2'>Audio</h4>
+                  <div className='space-y-2'>
+                    {songVoices.map((voice) => (
+                      <div key={voice.id}>
+                        <div className='flex items-center gap-2 mb-1'>
+                          <VoiceTypeBadge voiceType={voice.voiceType} />
+                          <span className='text-sm font-medium'>
+                            {voice.labelRaw}
                           </span>
-                        )}
+                        </div>
+                        <div className='ml-4 space-y-1'>
+                          {songFiles
+                            .filter(
+                              (f) =>
+                                f.fileType === 'AUDIO' &&
+                                f.voiceId === voice.id,
+                            )
+                            .map((file) => (
+                              <FileItem
+                                key={file.id}
+                                file={file}
+                                onDownload={handleDownload}
+                                onDelete={() => setDeleteFile(file)}
+                              />
+                            ))}
+                          {songFiles.filter(
+                            (f) =>
+                              f.fileType === 'AUDIO' && f.voiceId === voice.id,
+                          ).length === 0 && (
+                            <p className='text-xs text-muted-foreground'>
+                              Keine Audio-Dateien
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className='text-sm text-muted-foreground'>
-                    Keine Dateien vorhanden
-                  </p>
-                )}
+                    ))}
+                    {songVoices.length === 0 && (
+                      <p className='text-sm text-muted-foreground'>
+                        Keine Stimmen vorhanden
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -305,6 +506,27 @@ export function SongDetail() {
           </Card>
         </div>
       </ScrollArea>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteFile} onOpenChange={() => setDeleteFile(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Datei löschen</DialogTitle>
+            <DialogDescription>
+              Sind Sie sicher, dass Sie diese Datei löschen möchten? Diese
+              Aktion kann nicht rückgängig gemacht werden.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setDeleteFile(null)}>
+              Abbrechen
+            </Button>
+            <Button variant='destructive' onClick={handleDelete}>
+              Löschen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

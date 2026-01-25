@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm'
 import {
   bigint,
   index,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -21,12 +22,7 @@ export const voiceTypeEnum = pgEnum('voice_type', [
   'UNASSIGNED',
 ])
 
-export const fileTypeEnum = pgEnum('file_type', [
-  'ORIGINAL_PDF',
-  'MUSIC_XML',
-  'FULL_MP3',
-  'VOICE_MP3',
-])
+export const fileTypeEnum = pgEnum('file_type', ['SCORE', 'MUSIC_XML', 'AUDIO'])
 
 export const jobStatusEnum = pgEnum('job_status', [
   'PENDING',
@@ -44,6 +40,7 @@ export const songs = pgTable('songs', {
   finishedAt: timestamp({ withTimezone: true }),
   errorMessage: text(),
   createdAt: timestamp({ withTimezone: true }).defaultNow(),
+  progress: integer().default(0),
 })
 
 export const files = pgTable(
@@ -53,12 +50,17 @@ export const files = pgTable(
     songId: uuid()
       .notNull()
       .references(() => songs.id, { onDelete: 'cascade' }),
+    voiceId: uuid().references(() => voices.id, { onDelete: 'cascade' }),
     fileType: fileTypeEnum().notNull(),
     s3Key: text().notNull(),
+    originalName: text(),
     sizeBytes: bigint({ mode: 'number' }),
     createdAt: timestamp({ withTimezone: true }).defaultNow(),
   },
-  (table) => [index('idx_files_song').on(table.songId)],
+  (table) => [
+    index('idx_files_song').on(table.songId),
+    index('idx_files_voice').on(table.voiceId),
+  ],
 )
 
 export const voices = pgTable(
@@ -68,9 +70,6 @@ export const voices = pgTable(
     songId: uuid()
       .notNull()
       .references(() => songs.id, { onDelete: 'cascade' }),
-    fileId: uuid()
-      .notNull()
-      .references(() => files.id, { onDelete: 'cascade' }),
     labelRaw: varchar({ length: 100 }).notNull(),
     voiceType: voiceTypeEnum().default('UNASSIGNED'),
     createdAt: timestamp({ withTimezone: true }).defaultNow(),
