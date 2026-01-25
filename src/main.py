@@ -11,8 +11,8 @@ if str(_project_root) not in sys.path:
 
 from src.config import Config, load_config
 from src.processor import BaseProcessor
-from src.processors.dummy_processor import DummyProcessor
-from src.processors.musicxml_processor import MusicXMLProcessor
+from src.processors.xml_from_input_processor import XMLFromInputProcessor
+from src.processors.voices_from_xml_processor import VoicesFromXMLProcessor
 from src.s3_client import make_s3_client
 from src.worker import create_worker
 
@@ -47,9 +47,9 @@ def create_processor(config: Config) -> BaseProcessor:
         force_path_style=config.s3_force_path_style,
     )
 
-    # Use MusicXML processor as default
-    # For testing, you could switch to DummyProcessor
-    return MusicXMLProcessor(s3_client=s3_client, bucket=config.s3_bucket)
+    # Use XMLFromInput processor as default
+    # This handles both PDF/PNG to MusicXML conversion
+    return XMLFromInputProcessor(s3_client=s3_client, bucket=config.s3_bucket)
 
 
 def main() -> None:

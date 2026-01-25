@@ -6,18 +6,21 @@ import time
 import traceback
 from typing import Any, Callable, Dict, Optional
 
+import psycopg
+
 import pika
 
 from src.config import Config
 from src.db import (
+    claim_job,
     db_connect,
-    fetch_inputs,
     insert_output_file,
     mark_completed,
     mark_failed,
 )
 from src.processor import BaseProcessor
 from src.s3_client import make_s3_client
+from src.task_types import validate_task_message, TaskType
 
 
 class JobWorker:
@@ -114,69 +117,86 @@ class JobWorker:
             body: Message body bytes.
         """
         try:
-            job_id = self._parse_message(body)
-        except Exception:
+            message_data = self._parse_message(body)
+            print(message_data)
+            job_id = message_data["job_id"]
+            task_type = message_data["task_type"]
+            task_params = message_data["task_params"]
+            print(
+                f"[debug] parsed message: job_id={job_id}, task_type={task_type}, task_params={task_params}",
+                flush=True,
+            )
+        except Exception as e:
             # Malformed message - don't requeue to avoid infinite loop
+            print(e)
             channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
             return
 
-        conn = None
         try:
-            conn = db_connect(self.config.db_url)
+            with db_connect(self.config.db_url) as conn:
+                print(f"[debug] claiming job")
+                # Transaction 1: Claim the job
+                conn.execute("BEGIN;")
+                claimed = self._claim_job(conn, job_id)
+                conn.commit()
 
-            # Transaction 1: Claim the job
-            conn.execute("BEGIN;")
-            claimed = self._claim_job(conn, job_id)
-            conn.commit()
+                if not claimed:
+                    # Job already processing or completed - ack and skip
+                    channel.basic_ack(delivery_tag=method.delivery_tag)
+                    return
 
-            if not claimed:
-                # Job already processing or completed - ack and skip
+                # Transaction 2: Process and complete
+                conn.execute("BEGIN;")
+                self._process_and_complete(conn, job_id, task_type, task_params)
+                conn.commit()
+
                 channel.basic_ack(delivery_tag=method.delivery_tag)
-                return
-
-            # Transaction 2: Process and complete
-            conn.execute("BEGIN;")
-            self._process_and_complete(conn, job_id)
-            conn.commit()
-
-            channel.basic_ack(delivery_tag=method.delivery_tag)
 
         except Exception as e:
+            print(e)
             self._handle_error(conn, channel, method, job_id, e)
-        finally:
-            if conn is not None:
-                try:
-                    conn.close()
-                except Exception:
-                    pass
 
-    def _parse_message(self, body: bytes) -> str:
-        """Parse job_id from message body."""
+    def _parse_message(self, body: bytes) -> Dict[str, Any]:
+        """Parse task message from message body."""
         data = json.loads(body.decode("utf-8"))
-        job_id = data.get("job_id")
-        if not isinstance(job_id, str):
-            raise ValueError("Message missing job_id")
-        return job_id
 
-    def _claim_job(self, conn: Any, job_id: str) -> Optional[Dict[str, Any]]:
+        # Validate message structure
+        validate_task_message(data)
+
+        return data
+
+    def _claim_job(
+        self, conn: psycopg.Connection, job_id: str
+    ) -> Optional[Dict[str, Any]]:
         """Claim a pending job for processing."""
-        from src.db import claim_job
-
         return claim_job(conn, job_id)
 
-    def _process_and_complete(self, conn: Any, job_id: str) -> None:
+    def _process_and_complete(
+        self,
+        conn: psycopg.Connection,
+        job_id: str,
+        task_type: str,
+        task_params: Dict[str, Any],
+    ) -> None:
         """
-        Process a job and mark it as completed.
+        Process a task and mark it as completed.
 
         Args:
             conn: Database connection.
             job_id: Job identifier.
+            task_type: Type of the task to process.
+            task_params: Task-specific parameters.
         """
-        # Fetch input files
-        inputs = fetch_inputs(conn, job_id)
+        # Fetch task-specific input files
+        inputs = self._fetch_task_inputs(conn, job_id, task_type, task_params)
+        print(f"[debug] fetched inputs: {inputs}", flush=True)
 
         # Process using the configured processor
         result = self.processor.process(job_id, inputs)
+        print(
+            f"[debug] processing result: success={result.success}, output_files={len(result.output_files)}",
+            flush=True,
+        )
 
         if not result.success:
             raise RuntimeError(result.error_message or "Processing failed")
@@ -194,9 +214,37 @@ class JobWorker:
         # Mark job as completed
         mark_completed(conn, job_id)
 
+    def _fetch_task_inputs(
+        self,
+        conn: psycopg.Connection,
+        job_id: str,
+        task_type: str,
+        task_params: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """
+        Extract input file information from task parameters.
+
+        Args:
+            conn: Database connection (unused, kept for interface compatibility).
+            job_id: Job identifier (unused, kept for interface compatibility).
+            task_type: Type of the task (unused, kept for interface compatibility).
+            task_params: Task parameters containing input_key.
+
+        Returns:
+            Dict with input file information.
+
+        Raises:
+            RuntimeError: If input_key not found in task_params.
+        """
+        input_key = task_params.get("input_key")
+        if not input_key:
+            raise RuntimeError("task_params missing required field: input_key")
+
+        return {"input_key": input_key}
+
     def _handle_error(
         self,
-        conn: Any,
+        conn: Optional[psycopg.Connection],
         channel: Any,
         method: Any,
         job_id: str,
@@ -212,6 +260,7 @@ class JobWorker:
             job_id: Job identifier.
             error: The exception that occurred.
         """
+        print(f"[debug] handling error for job {job_id}: {error}", flush=True)
         if conn is not None:
             try:
                 conn.rollback()

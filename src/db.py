@@ -18,10 +18,16 @@ def db_connect(db_url: str) -> Generator[psycopg.Connection, None, None]:
     Yields:
         A database connection with dict row factory.
     """
+    print(f"[debug] trying to make a connection @ {db_url}")
     conn = psycopg.connect(db_url, row_factory=dict_row)
     try:
+        print(f"[debug] trying to yield connection")
         yield conn
+    except Exception as e:
+        print(f"[error] {e}")
     finally:
+        print(f"[debug] closing connection")
+
         conn.close()
 
 
@@ -43,11 +49,11 @@ def claim_job(conn: psycopg.Connection, job_id: str) -> Optional[Dict[str, Any]]
             """
       UPDATE songs
       SET status = 'PROCESSING',
-          started_at = COALESCE(started_at, NOW()),
-          error_message = NULL
+          "startedAt" = COALESCE("startedAt", NOW()),
+          "errorMessage" = NULL
       WHERE id = %(id)s
         AND status = 'PENDING'
-      RETURNING id, status, started_at;
+      RETURNING id, status, "startedAt";
       """,
             {"id": job_id},
         )
@@ -69,8 +75,8 @@ def mark_failed(conn: psycopg.Connection, job_id: str, error_message: str) -> No
             """
       UPDATE songs
       SET status = 'FAILED',
-          finished_at = NOW(),
-          error_message = %(err)s
+          "finishedAt" = NOW(),
+          "errorMessage" = %(err)s
       WHERE id = %(id)s;
       """,
             {"id": job_id, "err": error_message[:10000]},
@@ -90,46 +96,12 @@ def mark_completed(conn: psycopg.Connection, job_id: str) -> None:
             """
       UPDATE songs
       SET status = 'COMPLETED',
-          finished_at = NOW(),
-          error_message = NULL
+          "finishedAt" = NOW(),
+          "errorMessage" = NULL
       WHERE id = %(id)s;
       """,
             {"id": job_id},
         )
-
-
-def fetch_inputs(conn: psycopg.Connection, job_id: str) -> Dict[str, Any]:
-    """
-    Fetch input file information for a job.
-
-    Args:
-        conn: Database connection.
-        job_id: The job identifier.
-
-    Returns:
-        Dict with input file information.
-
-    Raises:
-        RuntimeError: If no input file found.
-    """
-    with conn.cursor() as cur:
-        cur.execute(
-            """
-      SELECT f.s3_key
-      FROM files f
-      WHERE f.song_id = %(id)s
-        AND f.file_type = 'ORIGINAL_PDF'
-      ORDER BY f.created_at ASC
-      LIMIT 1;
-      """,
-            {"id": job_id},
-        )
-        row = cur.fetchone()
-
-    if not row:
-        raise RuntimeError("No ORIGINAL_PDF input file for job")
-
-    return {"pdf_key": row["s3_key"]}
 
 
 def insert_output_file(
@@ -148,7 +120,7 @@ def insert_output_file(
     with conn.cursor() as cur:
         cur.execute(
             """
-      INSERT INTO files (song_id, file_type, s3_key, size_bytes)
+      INSERT INTO files (songId, fileType, s3Key, sizeBytes)
       VALUES (%(song_id)s, %(file_type)s, %(s3_key)s, %(size_bytes)s);
       """,
             {
