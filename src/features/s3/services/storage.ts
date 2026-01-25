@@ -5,10 +5,14 @@ import {
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { createServerFn } from '@tanstack/react-start'
+import { eq } from 'drizzle-orm'
 import { v7 as uuidv7 } from 'uuid'
 import z from 'zod'
+import { db } from '@/db'
 import { authMiddleware } from '@/features/auth/middleware/auth'
 import { bucketName, s3Client } from '@/features/s3/lib/client'
+import { files as filesTable } from '@/features/scores/db/schema'
+import { generateTxId } from '@/lib/utils'
 
 const generateKey = (file: File): string => {
   const uuidV7 = uuidv7() // uuidv7 ist eine aktive Entscheidung von mir für die Zeit
@@ -104,4 +108,32 @@ export const deleteFileFn = createServerFn({ method: 'POST' })
   .handler(async ({ data: { key } }) => {
     await deleteFile({ key })
     return { success: true }
+  })
+
+export const deleteFileFromDbFn = createServerFn({ method: 'POST' })
+  .inputValidator(z.object({ id: z.string() }))
+  .middleware([authMiddleware])
+  .handler(async ({ data: { id } }) => {
+    await db.transaction(async (tx) => {
+      const txid = await generateTxId(tx)
+      await tx.delete(filesTable).where(eq(filesTable.id, id))
+    })
+    return { success: true }
+  })
+
+export const getFileMetadataFn = createServerFn({ method: 'GET' })
+  .inputValidator(z.object({ key: z.string() }))
+  .middleware([authMiddleware])
+  .handler(async ({ data: { key } }) => {
+    const { HeadObjectCommand } = await import('@aws-sdk/client-s3')
+    const command = new HeadObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+    })
+    const response = await s3Client.send(command)
+    return {
+      originalName: response.Metadata?.originalname,
+      contentType: response.ContentType,
+      size: response.ContentLength,
+    }
   })

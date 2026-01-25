@@ -1,3 +1,4 @@
+import { eq, useLiveQuery } from '@tanstack/react-db'
 import {
   ChevronDown,
   ChevronUp,
@@ -10,11 +11,25 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useSongContext } from '@/features/scores/context/SongContext'
+import { voicesCollection } from '@/features/scores/db/collections'
 
 export function MusicBar() {
-  const { songTitle } = useSongContext()
+  const { songTitle, selectedSongId } = useSongContext()
   const [currentVoice, setCurrentVoice] = useState('gesamt')
   const [isCollapsed, setIsCollapsed] = useState(false)
+
+  const { data: voices } = useLiveQuery((q) =>
+    q
+      .from({ voicesCollection })
+      .where((v) => eq(v.voicesCollection.songId, selectedSongId)),
+  )
+
+  const voiceOptions = voices
+    .map((v) => ({
+      label: v.labelRaw,
+      value: v.id,
+    }))
+    .concat([{ label: 'Gesamt', value: 'gesamt' }])
 
   return (
     <footer className='fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t p-4 pb-8 lg:pb-4'>
@@ -32,13 +47,13 @@ export function MusicBar() {
               spacing={0}
               className='justify-center flex-wrap'
             >
-              {['Sopran', 'Alt', 'Tenor', 'Bass', 'Gesamt'].map((v) => (
+              {voiceOptions.map((v) => (
                 <ToggleGroupItem
-                  key={v}
-                  value={v.toLowerCase()}
+                  key={v.value}
+                  value={v.value}
                   className='rounded-full px-4 h-8 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground'
                 >
-                  {v}
+                  {v.label}
                 </ToggleGroupItem>
               ))}
             </ToggleGroup>
