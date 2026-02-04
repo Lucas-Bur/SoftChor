@@ -1,0 +1,1 @@
+ALTER TABLE "songs" ADD COLUMN "progress" integer DEFAULT 0;
