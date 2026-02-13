@@ -1,6 +1,6 @@
 import { Clock } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@repo/ui'
 
 import type { Song } from '@repo/database'
 

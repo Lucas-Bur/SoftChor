@@ -2,10 +2,8 @@ import { useState } from 'react'
 
 import { ArrowRight, Music2, Plus, Search } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { Button, Card, InputGroup, InputGroupAddon, InputGroupInput, ScrollArea } from '@repo/ui'
+
 import { AddSongForm } from '@/features/scores/components/AddSongForm'
 import { useSongContext } from '@/features/scores/context/SongContext'
 import { songsCollection } from '@/features/scores/db/collections'

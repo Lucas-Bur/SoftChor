@@ -5,10 +5,8 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { db, files, generateTxId, SONG_FILE } from '@repo/database'
-
-import { FileUpload } from '@/components/FileUpload'
-import { Button } from '@/components/ui/button'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -16,22 +14,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@repo/ui'
+
+import { FileUpload } from '@/components/FileUpload'
 import { uploadFileFn } from '@/features/s3/services/storage'
 import { voicesCollection } from '@/features/scores/db/collections'
 

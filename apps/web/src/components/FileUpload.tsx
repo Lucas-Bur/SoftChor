@@ -4,9 +4,7 @@ import { useState } from 'react'
 
 import { FileAudio, Loader2, X } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import { cn } from '@/lib/utils'
+import { Button, cn, Progress } from '@repo/ui'
 
 interface FileUploadProps {
   accept?: string

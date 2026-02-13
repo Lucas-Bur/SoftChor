@@ -40,6 +40,7 @@
     "@repo/queue": "workspace:*",
     "@repo/storage": "workspace:*",
     "@repo/sync": "workspace:*",
+    "@repo/ui": "workspace:*",
     "@repo/validation": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/db": "^0.5.12",

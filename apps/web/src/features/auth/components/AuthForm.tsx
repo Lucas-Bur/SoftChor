@@ -3,19 +3,27 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { type LoginInput, loginSchema, type RegisterInput, registerSchema } from '@repo/auth'
-
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/ui/motion-tabs'
+  Input,
+  MotionTabs,
+  MotionTabsContent,
+  MotionTabsContents,
+  MotionTabsList,
+  MotionTabsTrigger,
+} from '@repo/ui'
+
 import { authClient } from '@/features/auth/lib/auth-client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -88,15 +96,15 @@ export function AuthForm({ redirectTo }: AuthFormProps) {
 
   return (
     <div className='flex min-h-[50vh] items-start justify-center p-4 pt-14'>
-      <Tabs defaultValue='login' className='w-100'>
-        <TabsList className='grid w-full grid-cols-2'>
-          <TabsTrigger value='login'>Anmelden</TabsTrigger>
-          <TabsTrigger value='register'>Registrieren</TabsTrigger>
-        </TabsList>
+      <MotionTabs defaultValue='login' className='w-100'>
+        <MotionTabsList className='grid w-full grid-cols-2'>
+          <MotionTabsTrigger value='login'>Anmelden</MotionTabsTrigger>
+          <MotionTabsTrigger value='register'>Registrieren</MotionTabsTrigger>
+        </MotionTabsList>
 
-        <TabsContents>
+        <MotionTabsContents>
           {/* LOGIN TAB */}
-          <TabsContent value='login' key='login'>
+          <MotionTabsContent value='login' key='login'>
             <Card>
               <CardHeader>
                 <CardTitle>Willkommen zurück</CardTitle>
@@ -143,10 +151,10 @@ export function AuthForm({ redirectTo }: AuthFormProps) {
                 </Form>
               </CardContent>
             </Card>
-          </TabsContent>
+          </MotionTabsContent>
 
           {/* REGISTER TAB */}
-          <TabsContent value='register' key='register'>
+          <MotionTabsContent value='register' key='register'>
             <Card>
               <CardHeader>
                 <CardTitle>Konto erstellen</CardTitle>
@@ -206,9 +214,9 @@ export function AuthForm({ redirectTo }: AuthFormProps) {
                 </Form>
               </CardContent>
             </Card>
-          </TabsContent>
-        </TabsContents>
-      </Tabs>
+          </MotionTabsContent>
+        </MotionTabsContents>
+      </MotionTabs>
     </div>
   )
 }

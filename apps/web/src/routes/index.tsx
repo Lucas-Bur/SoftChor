@@ -1,6 +1,7 @@
 import { AlertTriangle, CheckCircle2, Cpu, Database, Fingerprint } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@repo/ui'
+
 import { enqueueSongProcessing } from '@/features/queue/services/queue'
 
 import { createFileRoute } from '@tanstack/react-router'

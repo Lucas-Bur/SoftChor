@@ -2,17 +2,18 @@ import { useState } from 'react'
 
 import { toast } from 'sonner' // oder console.log als Fallback
 
-import { Button } from '@/components/ui/button'
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+  Input,
+  Label,
+} from '@repo/ui'
+
 import { authClient } from '@/features/auth/lib/auth-client'
 
 export function UserProfile() {

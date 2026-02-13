@@ -43,11 +43,12 @@ const AuthenticatedScoresRoute = AuthenticatedScoresRouteImport.update({
   path: '/scores',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedScoresIndexRoute = AuthenticatedScoresIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedScoresRoute,
-} as any)
+const AuthenticatedScoresIndexRoute =
+  AuthenticatedScoresIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedScoresRoute,
+  } as any)
 const ApiSyncSplatRoute = ApiSyncSplatRouteImport.update({
   id: '/api/sync/$',
   path: '/api/sync/$',
@@ -58,11 +59,12 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedScoresSongIdRoute = AuthenticatedScoresSongIdRouteImport.update({
-  id: '/$songId',
-  path: '/$songId',
-  getParentRoute: () => AuthenticatedScoresRoute,
-} as any)
+const AuthenticatedScoresSongIdRoute =
+  AuthenticatedScoresSongIdRouteImport.update({
+    id: '/$songId',
+    path: '/$songId',
+    getParentRoute: () => AuthenticatedScoresRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -107,7 +109,14 @@ export interface FileRouteTypes {
     | '/api/sync/$'
     | '/scores/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/profile' | '/scores/$songId' | '/api/auth/$' | '/api/sync/$' | '/scores'
+  to:
+    | '/'
+    | '/login'
+    | '/profile'
+    | '/scores/$songId'
+    | '/api/auth/$'
+    | '/api/sync/$'
+    | '/scores'
   id:
     | '__root__'
     | '/'
@@ -208,9 +217,8 @@ const AuthenticatedScoresRouteChildren: AuthenticatedScoresRouteChildren = {
   AuthenticatedScoresIndexRoute: AuthenticatedScoresIndexRoute,
 }
 
-const AuthenticatedScoresRouteWithChildren = AuthenticatedScoresRoute._addFileChildren(
-  AuthenticatedScoresRouteChildren
-)
+const AuthenticatedScoresRouteWithChildren =
+  AuthenticatedScoresRoute._addFileChildren(AuthenticatedScoresRouteChildren)
 
 interface AuthenticatedRouteChildren {
   AuthenticatedScoresRoute: typeof AuthenticatedScoresRouteWithChildren
@@ -221,7 +229,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren
+  AuthenticatedRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {

@@ -6,7 +6,7 @@ import * as React from 'react'
 
 import { AnimatePresence, motion } from 'motion/react'
 
-import { cn } from '@/lib/utils'
+import { cn } from '../../lib/utils'
 
 import type { Transition } from 'motion/react'
 
@@ -486,7 +486,7 @@ function MotionHighlightItem({
 
           <div
             data-slot='motion-highlight-item'
-            className={cn('relative z-[1]', className)}
+            className={cn('relative z-1', className)}
             {...dataAttributes}
           >
             {children}

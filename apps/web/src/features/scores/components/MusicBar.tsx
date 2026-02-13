@@ -3,9 +3,8 @@ import { useState } from 'react'
 import { ChevronDown, ChevronUp, Play, SkipBack, SkipForward } from 'lucide-react'
 import { motion } from 'motion/react'
 
-import { Button } from '@/components/ui/button'
-import { Slider } from '@/components/ui/slider'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { Button, Slider, ToggleGroup, ToggleGroupItem } from '@repo/ui'
+
 import { useSongContext } from '@/features/scores/context/SongContext'
 import { voicesCollection } from '@/features/scores/db/collections'
 
