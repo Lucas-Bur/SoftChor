@@ -1,16 +1,21 @@
+import { createContext, useContext, useEffect } from 'react'
+
+import { z } from 'zod'
+
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { getCookie, setCookie } from '@tanstack/react-start/server'
-import { createContext, useContext, useEffect } from 'react'
-import { z } from 'zod'
 
 type Theme = 'dark' | 'light' | 'system'
 
-type ThemeProviderProps = {
+interface ThemeProviderProps {
   children: React.ReactNode
 }
 
-type ThemeProviderState = { theme: Theme; setTheme: (theme: Theme) => void }
+interface ThemeProviderState {
+  theme: Theme
+  setTheme: (theme: Theme) => void
+}
 
 const THEME_COOKIE_NAME = 'ui-theme'
 
@@ -40,16 +45,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   })
 
   useEffect(() => {
-    window
-      .matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', (event) => {
-        if (data === 'system') {
-          const newColorScheme = event.matches ? 'dark' : 'light'
-          const root = window.document.documentElement
-          root.classList.remove('light', 'dark')
-          root.classList.add(newColorScheme)
-        }
-      })
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+      if (data === 'system') {
+        const newColorScheme = event.matches ? 'dark' : 'light'
+        const root = window.document.documentElement
+        root.classList.remove('light', 'dark')
+        root.classList.add(newColorScheme)
+      }
+    })
   }, [data])
 
   useEffect(() => {
@@ -59,8 +62,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     root.classList.remove('light', 'dark')
 
     if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
-        .matches
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
         ? 'dark'
         : 'light'
 
@@ -80,18 +82,13 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     },
   }
 
-  return (
-    <ThemeProviderContext.Provider value={value}>
-      {children}
-    </ThemeProviderContext.Provider>
-  )
+  return <ThemeProviderContext.Provider value={value}>{children}</ThemeProviderContext.Provider>
 }
 
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext)
 
-  if (context === undefined)
-    throw new Error('useTheme must be used within a ThemeProvider')
+  if (context === undefined) throw new Error('useTheme must be used within a ThemeProvider')
 
   return context
 }

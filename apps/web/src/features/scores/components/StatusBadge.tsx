@@ -1,6 +1,8 @@
 import { Clock } from 'lucide-react'
+
 import { Badge } from '@/components/ui/badge'
-import type { Song } from '@/features/scores/db/schema'
+
+import type { Song } from '@repo/database'
 
 export function StatusBadge({ status }: { status: Song['status'] }) {
   switch (status) {

@@ -1,10 +1,11 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { eq, useLiveQuery } from '@tanstack/react-db'
-import { createServerFn } from '@tanstack/react-start'
 import { useState } from 'react'
+
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+
+import { db, files, generateTxId, SONG_FILE } from '@repo/database'
+
 import { FileUpload } from '@/components/FileUpload'
 import { Button } from '@/components/ui/button'
 import {
@@ -31,11 +32,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { db } from '@/db'
 import { uploadFileFn } from '@/features/s3/services/storage'
 import { voicesCollection } from '@/features/scores/db/collections'
-import { files, SONG_FILE } from '@/features/scores/db/schema'
-import { generateTxId } from '@/lib/utils'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { eq, useLiveQuery } from '@tanstack/react-db'
+import { createServerFn } from '@tanstack/react-start'
 
 const fileTypeLabels = {
   SCORE: 'Score (PDF/Image)',
@@ -57,13 +59,11 @@ interface FileUploadDialogProps {
 
 const uploadFileServer = createServerFn({ method: 'POST' })
   .inputValidator(z.instanceof(FormData))
-  .handler(async ({ data: formData }) => {
-    const songId = formData.get('songId') as string
-    const file = formData.get('file') as File
-    const fileType = formData.get(
-      'fileType',
-    ) as string as (typeof SONG_FILE)[number]
-    const voiceId = formData.get('voiceId') as string | null
+  .handler(async ({ data: inputFormData }) => {
+    const songId = inputFormData.get('songId') as string
+    const file = inputFormData.get('file') as File
+    const fileType = inputFormData.get('fileType') as string as (typeof SONG_FILE)[number]
+    const voiceId = inputFormData.get('voiceId') as string | null
     // Upload to S3
     const uploadResult = await uploadFileFn({
       data: (() => {
@@ -74,13 +74,13 @@ const uploadFileServer = createServerFn({ method: 'POST' })
     })
 
     // Save to DB
-    const result = await db.transaction(async (tx) => {
+    const result = await db.transaction(async tx => {
       const txid = await generateTxId(tx)
       const newFile = await tx
         .insert(files)
         .values({
           songId,
-          voiceId: voiceId || null,
+          voiceId: voiceId ?? null,
           fileType,
           s3Key: uploadResult.key,
           originalName: file.name,
@@ -98,10 +98,8 @@ export function FileUploadDialog({ songId, children }: FileUploadDialogProps) {
   const [uploading, setUploading] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  const { data: voices } = useLiveQuery((q) =>
-    q
-      .from({ voicesCollection })
-      .where((v) => eq(v.voicesCollection.songId, songId)),
+  const { data: voices } = useLiveQuery(q =>
+    q.from({ voicesCollection }).where(v => eq(v.voicesCollection.songId, songId))
   )
 
   const form = useForm<UploadForm>({
@@ -168,17 +166,14 @@ export function FileUploadDialog({ songId, children }: FileUploadDialogProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>File Type</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder='Select file type' />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {SONG_FILE.map((type) => (
+                      {SONG_FILE.map(type => (
                         <SelectItem key={type} value={type}>
                           {fileTypeLabels[type]}
                         </SelectItem>
@@ -204,7 +199,7 @@ export function FileUploadDialog({ songId, children }: FileUploadDialogProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {voices.map((voice) => (
+                        {voices.map(voice => (
                           <SelectItem key={voice.id} value={voice.id}>
                             {voice.labelRaw}
                           </SelectItem>
@@ -241,11 +236,7 @@ export function FileUploadDialog({ songId, children }: FileUploadDialogProps) {
           <Button variant='outline' onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button
-            type='submit'
-            onClick={handleSubmit}
-            disabled={!selectedFile || uploading}
-          >
+          <Button type='submit' onClick={handleSubmit} disabled={!selectedFile || uploading}>
             {uploading ? 'Uploading...' : 'Upload'}
           </Button>
         </DialogFooter>

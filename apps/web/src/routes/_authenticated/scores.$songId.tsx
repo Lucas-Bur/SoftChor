@@ -1,6 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { SongDetail } from '@/features/scores/components/SongDetail'
 import { songsCollection } from '@/features/scores/db/collections'
+
+import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/scores/$songId')({
   component: () => <SongDetail />,

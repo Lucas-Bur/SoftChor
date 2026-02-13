@@ -1,10 +1,9 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
 import { Check } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useForm } from 'react-hook-form'
+
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -22,8 +21,12 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+
 import { addSong } from '../db/collections'
 import { type AddSongFormSchema, addSongFormSchema } from '../lib/form-schema'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface AddSongFormProps {
   open: boolean
@@ -90,9 +93,7 @@ export function AddSongForm({ open, onOpenChange }: AddSongFormProps) {
             >
               <Check className='size-8' />
             </motion.div>
-            <h2 className='text-center text-2xl text-pretty font-bold mb-2'>
-              Song Added!
-            </h2>
+            <h2 className='text-center text-2xl text-pretty font-bold mb-2'>Song Added!</h2>
             <p className='text-center text-lg text-pretty text-muted-foreground'>
               The song has been added to your repertoire.
             </p>
@@ -107,9 +108,7 @@ export function AddSongForm({ open, onOpenChange }: AddSongFormProps) {
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>Add a new song</DialogTitle>
-          <DialogDescription>
-            Enter the song name to add it to your repertoire.
-          </DialogDescription>
+          <DialogDescription>Enter the song name to add it to your repertoire.</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -121,11 +120,7 @@ export function AddSongForm({ open, onOpenChange }: AddSongFormProps) {
                 <FormItem>
                   <FormLabel>Song name *</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder='Enter song name'
-                      disabled={isSubmitting}
-                    />
+                    <Input {...field} placeholder='Enter song name' disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -133,9 +128,7 @@ export function AddSongForm({ open, onOpenChange }: AddSongFormProps) {
             />
 
             {form.formState.errors.root && (
-              <p className='text-sm text-destructive'>
-                {form.formState.errors.root.message}
-              </p>
+              <p className='text-sm text-destructive'>{form.formState.errors.root.message}</p>
             )}
 
             <div className='flex justify-end gap-2'>

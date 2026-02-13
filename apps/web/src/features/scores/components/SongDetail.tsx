@@ -1,5 +1,5 @@
-import { useLiveQuery } from '@tanstack/react-db'
-import { Link, useParams } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+
 import {
   AlertTriangle,
   ArrowLeft,
@@ -11,8 +11,8 @@ import {
   Trash2,
   Upload,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -40,7 +40,11 @@ import {
   songsCollection,
   voicesCollection,
 } from '@/features/scores/db/collections'
-import type { SongFile, SongVoice } from '@/features/scores/db/schema'
+
+import type { SongFile, SongVoice } from '@repo/database'
+
+import { useLiveQuery } from '@tanstack/react-db'
+import { Link, useParams } from '@tanstack/react-router'
 
 function FileTypeBadge({ fileType }: { fileType: SongFile['fileType'] }) {
   const fileTypeLabels: Record<SongFile['fileType'], string> = {
@@ -66,10 +70,7 @@ function VoiceTypeBadge({ voiceType }: { voiceType: SongVoice['voiceType'] }) {
     UNASSIGNED: 'Nicht zugewiesen',
   }
 
-  const variantMap: Record<
-    string,
-    'default' | 'destructive' | 'outline' | 'secondary'
-  > = {
+  const variantMap: Record<string, 'default' | 'destructive' | 'outline' | 'secondary'> = {
     SOPRANO: 'default',
     ALTO: 'secondary',
     TENOR: 'outline',
@@ -78,9 +79,9 @@ function VoiceTypeBadge({ voiceType }: { voiceType: SongVoice['voiceType'] }) {
     UNASSIGNED: 'outline',
   }
 
-  const type = voiceType || 'UNASSIGNED'
-  const label = voiceTypeLabels[type] || type
-  const variant = variantMap[type] || 'outline'
+  const type = voiceType ?? 'UNASSIGNED'
+  const label = voiceTypeLabels[type] ?? type
+  const variant = variantMap[type] ?? 'outline'
 
   return (
     <Badge variant={variant} className='text-[10px] h-5'>
@@ -104,9 +105,7 @@ function FileItem({
     <div className='flex items-center justify-between p-2 rounded-lg bg-muted/50'>
       <div className='flex items-center gap-3'>
         <FileTypeBadge fileType={file.fileType} />
-        <span className='text-sm font-medium'>
-          {file.originalName || file.s3Key}
-        </span>
+        <span className='text-sm font-medium'>{file.originalName ?? file.s3Key}</span>
       </div>
       <div className='flex items-center gap-2'>
         {file.sizeBytes && (
@@ -134,21 +133,21 @@ export function SongDetail() {
   const { songId } = useParams({ from: '/_authenticated/scores/$songId' })
   const { setSelectedSongId, setSongTitle } = useSongContext()
 
-  const { data: songs } = useLiveQuery((q) =>
-    q.from({ songsCollection }).orderBy((q) => q.songsCollection.createdAt),
+  const { data: songs } = useLiveQuery(query =>
+    query.from({ songsCollection }).orderBy(q => q.songsCollection.createdAt)
   )
 
-  const { data: files } = useLiveQuery((q) =>
-    q.from({ filesCollection }).orderBy((q) => q.filesCollection.createdAt),
+  const { data: files } = useLiveQuery(query =>
+    query.from({ filesCollection }).orderBy(q => q.filesCollection.createdAt)
   )
 
-  const { data: voices } = useLiveQuery((q) =>
-    q.from({ voicesCollection }).orderBy((q) => q.voicesCollection.createdAt),
+  const { data: voices } = useLiveQuery(query =>
+    query.from({ voicesCollection }).orderBy(q => q.voicesCollection.createdAt)
   )
 
-  const song = songs.find((s) => s.id === songId)
-  const songFiles = files.filter((f) => f.songId === songId)
-  const songVoices = voices.filter((v) => v.songId === songId)
+  const song = songs.find(s => s.id === songId)
+  const songFiles = files.filter(f => f.songId === songId)
+  const songVoices = voices.filter(v => v.songId === songId)
 
   const [deleteFile, setDeleteFile] = useState<SongFile | null>(null)
 
@@ -165,7 +164,7 @@ export function SongDetail() {
       const urls = await getPresignedUrlsFromKeys({
         data: { keys: [file.s3Key] },
       })
-      const url = urls.find((u) => u.key === file.s3Key)?.url
+      const url = urls.find(u => u.key === file.s3Key)?.url
       if (url) {
         window.open(url, '_blank')
       } else {
@@ -194,7 +193,7 @@ export function SongDetail() {
 
   const handleProcessFile = async (
     file: SongFile,
-    taskType: 'generate_xml_from_input' | 'generate_voices_from_xml',
+    taskType: 'generate_xml_from_input' | 'generate_voices_from_xml'
   ) => {
     try {
       // Send message to queue with specific file
@@ -302,9 +301,7 @@ export function SongDetail() {
                 )}
                 {song.finishedAt && (
                   <div className='space-y-1'>
-                    <p className='text-sm text-muted-foreground'>
-                      Abgeschlossen
-                    </p>
+                    <p className='text-sm text-muted-foreground'>Abgeschlossen</p>
                     <div className='flex items-center gap-2 text-sm'>
                       <Clock className='h-4 w-4 text-muted-foreground' />
                       {new Date(song.finishedAt).toLocaleDateString('de-DE', {
@@ -322,7 +319,7 @@ export function SongDetail() {
               {song.status === 'PROCESSING' && (
                 <div className='space-y-2'>
                   <p className='text-sm text-muted-foreground'>Fortschritt</p>
-                  <Progress value={song.progress || 0} />
+                  <Progress value={song.progress ?? 0} />
                   <p className='text-sm text-center'>{song.progress ?? 0}%</p>
                 </div>
               )}
@@ -333,9 +330,7 @@ export function SongDetail() {
                     <AlertTriangle className='h-4 w-4' />
                     Fehlermeldung
                   </div>
-                  <p className='text-sm text-destructive/80'>
-                    {song.errorMessage}
-                  </p>
+                  <p className='text-sm text-destructive/80'>{song.errorMessage}</p>
                 </div>
               )}
             </CardContent>
@@ -364,23 +359,18 @@ export function SongDetail() {
                   <h4 className='text-sm font-medium mb-2'>Scores</h4>
                   <div className='space-y-2'>
                     {songFiles
-                      .filter((f) => f.fileType === 'SCORE')
-                      .map((file) => (
+                      .filter(f => f.fileType === 'SCORE')
+                      .map(file => (
                         <FileItem
                           key={file.id}
                           file={file}
                           onDownload={handleDownload}
                           onDelete={() => setDeleteFile(file)}
-                          onProcess={() =>
-                            handleProcessFile(file, 'generate_xml_from_input')
-                          }
+                          onProcess={() => handleProcessFile(file, 'generate_xml_from_input')}
                         />
                       ))}
-                    {songFiles.filter((f) => f.fileType === 'SCORE').length ===
-                      0 && (
-                      <p className='text-sm text-muted-foreground'>
-                        Keine Scores vorhanden
-                      </p>
+                    {songFiles.filter(f => f.fileType === 'SCORE').length === 0 && (
+                      <p className='text-sm text-muted-foreground'>Keine Scores vorhanden</p>
                     )}
                   </div>
                 </div>
@@ -390,23 +380,18 @@ export function SongDetail() {
                   <h4 className='text-sm font-medium mb-2'>MusicXML</h4>
                   <div className='space-y-2'>
                     {songFiles
-                      .filter((f) => f.fileType === 'MUSIC_XML')
-                      .map((file) => (
+                      .filter(f => f.fileType === 'MUSIC_XML')
+                      .map(file => (
                         <FileItem
                           key={file.id}
                           file={file}
                           onDownload={handleDownload}
                           onDelete={() => setDeleteFile(file)}
-                          onProcess={() =>
-                            handleProcessFile(file, 'generate_voices_from_xml')
-                          }
+                          onProcess={() => handleProcessFile(file, 'generate_voices_from_xml')}
                         />
                       ))}
-                    {songFiles.filter((f) => f.fileType === 'MUSIC_XML')
-                      .length === 0 && (
-                      <p className='text-sm text-muted-foreground'>
-                        Keine MusicXML vorhanden
-                      </p>
+                    {songFiles.filter(f => f.fileType === 'MUSIC_XML').length === 0 && (
+                      <p className='text-sm text-muted-foreground'>Keine MusicXML vorhanden</p>
                     )}
                   </div>
                 </div>
@@ -415,22 +400,16 @@ export function SongDetail() {
                 <div>
                   <h4 className='text-sm font-medium mb-2'>Audio</h4>
                   <div className='space-y-2'>
-                    {songVoices.map((voice) => (
+                    {songVoices.map(voice => (
                       <div key={voice.id}>
                         <div className='flex items-center gap-2 mb-1'>
                           <VoiceTypeBadge voiceType={voice.voiceType} />
-                          <span className='text-sm font-medium'>
-                            {voice.labelRaw}
-                          </span>
+                          <span className='text-sm font-medium'>{voice.labelRaw}</span>
                         </div>
                         <div className='ml-4 space-y-1'>
                           {songFiles
-                            .filter(
-                              (f) =>
-                                f.fileType === 'AUDIO' &&
-                                f.voiceId === voice.id,
-                            )
-                            .map((file) => (
+                            .filter(f => f.fileType === 'AUDIO' && f.voiceId === voice.id)
+                            .map(file => (
                               <FileItem
                                 key={file.id}
                                 file={file}
@@ -438,21 +417,15 @@ export function SongDetail() {
                                 onDelete={() => setDeleteFile(file)}
                               />
                             ))}
-                          {songFiles.filter(
-                            (f) =>
-                              f.fileType === 'AUDIO' && f.voiceId === voice.id,
-                          ).length === 0 && (
-                            <p className='text-xs text-muted-foreground'>
-                              Keine Audio-Dateien
-                            </p>
+                          {songFiles.filter(f => f.fileType === 'AUDIO' && f.voiceId === voice.id)
+                            .length === 0 && (
+                            <p className='text-xs text-muted-foreground'>Keine Audio-Dateien</p>
                           )}
                         </div>
                       </div>
                     ))}
                     {songVoices.length === 0 && (
-                      <p className='text-sm text-muted-foreground'>
-                        Keine Stimmen vorhanden
-                      </p>
+                      <p className='text-sm text-muted-foreground'>Keine Stimmen vorhanden</p>
                     )}
                   </div>
                 </div>
@@ -471,35 +444,28 @@ export function SongDetail() {
             <CardContent>
               <div className='space-y-2'>
                 {songVoices.length > 0 ? (
-                  songVoices.map((voice) => (
+                  songVoices.map(voice => (
                     <div
                       key={voice.id}
                       className='flex items-center justify-between p-3 rounded-lg bg-muted/50'
                     >
                       <div className='flex items-center gap-3'>
                         <VoiceTypeBadge voiceType={voice.voiceType} />
-                        <span className='text-sm font-medium'>
-                          {voice.labelRaw}
-                        </span>
+                        <span className='text-sm font-medium'>{voice.labelRaw}</span>
                       </div>
                       <div className='text-sm text-muted-foreground'>
                         {voice.createdAt
-                          ? new Date(voice.createdAt).toLocaleDateString(
-                              'de-DE',
-                              {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                              },
-                            )
+                          ? new Date(voice.createdAt).toLocaleDateString('de-DE', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })
                           : ''}
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className='text-sm text-muted-foreground'>
-                    Keine Stimmen vorhanden
-                  </p>
+                  <p className='text-sm text-muted-foreground'>Keine Stimmen vorhanden</p>
                 )}
               </div>
             </CardContent>
@@ -513,8 +479,8 @@ export function SongDetail() {
           <DialogHeader>
             <DialogTitle>Datei löschen</DialogTitle>
             <DialogDescription>
-              Sind Sie sicher, dass Sie diese Datei löschen möchten? Diese
-              Aktion kann nicht rückgängig gemacht werden.
+              Sind Sie sicher, dass Sie diese Datei löschen möchten? Diese Aktion kann nicht
+              rückgängig gemacht werden.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

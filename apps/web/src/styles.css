@@ -1,9 +1,9 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
 
-:root {  
+:root {
   --background: 210 40% 98%; /* Slate 50 */
   --foreground: 222 47% 11%; /* Slate 900 */
 
@@ -45,7 +45,7 @@
   --popover: 222 47% 6%;
   --popover-foreground: 210 40% 98%;
 
-  --primary: 190 100% 50%; 
+  --primary: 190 100% 50%;
   --primary-foreground: 222 47% 11%;
 
   --secondary: 217 33% 17%;
@@ -89,14 +89,19 @@
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: calc(var(--radius));
   --radius-lg: calc(var(--radius) + 2px);
-  
+
   /* Custom Animations für Data Flow */
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-float: float 6s ease-in-out infinite;
 
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
   }
 }
 
@@ -107,11 +112,12 @@
   body {
     @apply bg-background text-foreground antialiased selection:bg-cyan-500/30;
     /* Subtiles Grid Pattern im Hintergrund */
-    background-image: linear-gradient(to right, rgba(128, 128, 128, 0.05) 1px, transparent 1px),
+    background-image:
+      linear-gradient(to right, rgba(128, 128, 128, 0.05) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(128, 128, 128, 0.05) 1px, transparent 1px);
     background-size: 40px 40px;
   }
-  
+
   /* Scrollbar Styling für Data Aesthetic */
   ::-webkit-scrollbar {
     width: 8px;

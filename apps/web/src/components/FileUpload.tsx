@@ -1,18 +1,17 @@
 'use client'
 
-import { FileAudio, Loader2, X } from 'lucide-react'
 import { useState } from 'react'
+
+import { FileAudio, Loader2, X } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 
-type FileUploadProps = {
+interface FileUploadProps {
   accept?: string
   maxSize?: number // in bytes
-  onUpload?: (
-    file: File,
-    onProgress: (progress: number) => void,
-  ) => Promise<void>
+  onUpload?: (file: File, onProgress: (progress: number) => void) => Promise<void>
   onRemove?: () => void
 }
 
@@ -45,8 +44,8 @@ export function FileUpload({
       try {
         await onUpload(selectedFile, setProgress)
         setProgress(100)
-      } catch (e: unknown) {
-        console.error(e)
+      } catch (err: unknown) {
+        console.error(err)
         setError('Upload failed')
         setFile(null)
       } finally {
@@ -90,16 +89,12 @@ export function FileUpload({
               'border-2 border-dashed rounded-lg p-8',
               'cursor-pointer transition-colors',
               'hover:border-primary hover:bg-primary/5',
-              isUploading && 'pointer-events-none opacity-50',
+              isUploading && 'pointer-events-none opacity-50'
             )}
           >
             <FileAudio className='h-12 w-12 mb-4 text-muted-foreground' />
-            <p className='mb-2 text-foreground'>
-              Klicken Sie, um eine Datei auszuwählen
-            </p>
-            <p className='text-sm text-muted-foreground'>
-              Max {formatBytes(maxSize)}
-            </p>
+            <p className='mb-2 text-foreground'>Klicken Sie, um eine Datei auszuwählen</p>
+            <p className='text-sm text-muted-foreground'>Max {formatBytes(maxSize)}</p>
           </label>
         </div>
       )}
@@ -111,9 +106,7 @@ export function FileUpload({
             <Loader2 className='h-8 w-8 animate-spin text-primary' />
             <div className='flex-1 min-w-0'>
               <p className='text-sm font-medium truncate'>{file.name}</p>
-              <p className='text-xs text-muted-foreground'>
-                Uploading... {progress}%
-              </p>
+              <p className='text-xs text-muted-foreground'>Uploading... {progress}%</p>
             </div>
           </div>
           <Progress value={progress} className='h-2' />
@@ -130,9 +123,7 @@ export function FileUpload({
               </div>
               <div className='min-w-0'>
                 <p className='text-sm font-medium truncate'>{file.name}</p>
-                <p className='text-xs text-muted-foreground'>
-                  {formatBytes(file.size)}
-                </p>
+                <p className='text-xs text-muted-foreground'>{formatBytes(file.size)}</p>
               </div>
             </div>
             <Button variant='ghost' size='icon' onClick={handleRemove}>

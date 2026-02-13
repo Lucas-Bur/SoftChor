@@ -1,7 +1,10 @@
-import { Link } from '@tanstack/react-router'
 import { Layers } from 'lucide-react'
+
 import { UserMenu } from '@/features/auth/components/UserMenu'
+
 import { ModeToggle } from './ModeToggle'
+
+import { Link } from '@tanstack/react-router'
 
 export function Header() {
   return (
@@ -26,13 +29,6 @@ export function Header() {
               activeProps={{ className: 'text-foreground font-semibold' }}
             >
               Scores
-            </Link>
-            <Link
-              to='/demo'
-              className='transition-colors hover:text-foreground/80 text-foreground/60'
-              activeProps={{ className: 'text-foreground font-semibold' }}
-            >
-              Data Explorer
             </Link>
           </nav>
         </div>

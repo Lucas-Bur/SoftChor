@@ -1,5 +1,7 @@
 import { useState } from 'react'
+
 import { toast } from 'sonner' // oder console.log als Fallback
+
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -15,7 +17,7 @@ import { authClient } from '@/features/auth/lib/auth-client'
 
 export function UserProfile() {
   const { data: session } = authClient.useSession()
-  const [name, setName] = useState(session?.user.name || '')
+  const [name, setName] = useState(session?.user.name ?? '')
   const [loading, setLoading] = useState(false)
 
   // Update syncen, wenn Session geladen wird
@@ -46,32 +48,18 @@ export function UserProfile() {
       <Card>
         <CardHeader>
           <CardTitle>Profil</CardTitle>
-          <CardDescription>
-            Aktualisiere deine persönlichen Informationen.
-          </CardDescription>
+          <CardDescription>Aktualisiere deine persönlichen Informationen.</CardDescription>
         </CardHeader>
         <CardContent className='space-y-4'>
           <div className='grid w-full items-center gap-1.5'>
             <Label htmlFor='email'>Email</Label>
-            <Input
-              type='email'
-              id='email'
-              value={session.user.email}
-              disabled
-            />
-            <p className='text-sm text-muted-foreground'>
-              E-Mail kann nicht geändert werden.
-            </p>
+            <Input type='email' id='email' value={session.user.email} disabled />
+            <p className='text-sm text-muted-foreground'>E-Mail kann nicht geändert werden.</p>
           </div>
 
           <div className='grid w-full items-center gap-1.5'>
             <Label htmlFor='name'>Name</Label>
-            <Input
-              type='text'
-              id='name'
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            <Input type='text' id='name' value={name} onChange={e => setName(e.target.value)} />
           </div>
         </CardContent>
         <CardFooter>

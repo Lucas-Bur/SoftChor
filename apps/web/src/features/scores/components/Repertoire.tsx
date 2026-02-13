@@ -1,38 +1,34 @@
-import { useLiveQuery } from '@tanstack/react-db'
-import { Link } from '@tanstack/react-router'
-import { ArrowRight, Music2, Plus, Search } from 'lucide-react'
 import { useState } from 'react'
+
+import { ArrowRight, Music2, Plus, Search } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@/components/ui/input-group'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { AddSongForm } from '@/features/scores/components/AddSongForm'
 import { useSongContext } from '@/features/scores/context/SongContext'
 import { songsCollection } from '@/features/scores/db/collections'
-import type { Song } from '@/features/scores/db/schema'
+
 import { StatusBadge } from './StatusBadge'
+
+import type { Song } from '@repo/database'
+
+import { useLiveQuery } from '@tanstack/react-db'
+import { Link } from '@tanstack/react-router'
 
 export function Repertoire() {
   const [searchQuery, setSearchQuery] = useState('')
 
-  const { data: songs } = useLiveQuery((q) =>
-    q.from({ songsCollection }).orderBy((q) => q.songsCollection.createdAt),
+  const { data: songs } = useLiveQuery(query =>
+    query.from({ songsCollection }).orderBy(q => q.songsCollection.createdAt)
   )
 
-  const {
-    setSelectedSongId,
-    setSongTitle,
-    showAddSongForm,
-    setShowAddSongForm,
-  } = useSongContext()
+  const { setSelectedSongId, setSongTitle, showAddSongForm, setShowAddSongForm } = useSongContext()
 
   // Filter songs based on search query
-  const filteredSongs = songs.filter((song) =>
-    song.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  const filteredSongs = songs.filter(song =>
+    song.title.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const handleSongClick = (song: Song) => {
@@ -59,7 +55,7 @@ export function Repertoire() {
             <InputGroupInput
               placeholder='Song suchen...'
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
             />
             <InputGroupAddon>
               <Search />
@@ -78,13 +74,11 @@ export function Repertoire() {
       <ScrollArea className='flex-1 px-4'>
         <h2 className='text-xs font-semibold mb-4 opacity-50 uppercase tracking-wider'>
           Aktuelles Repertoire{' '}
-          <span className='float-right text-[10px]'>
-            {filteredSongs.length} Titel
-          </span>
+          <span className='float-right text-[10px]'>{filteredSongs.length} Titel</span>
         </h2>
 
         <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 pb-32'>
-          {filteredSongs.map((song) => {
+          {filteredSongs.map(song => {
             return (
               <Card
                 key={song.id}

@@ -1,6 +1,8 @@
-import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { enqueueJob } from '@/features/queue/lib/rabbitmq'
+
+import { enqueueJob } from '@repo/queue'
+
+import { createServerFn } from '@tanstack/react-start'
 
 export const enqueueSongProcessing = createServerFn({ method: 'POST' })
   .inputValidator(
@@ -8,7 +10,7 @@ export const enqueueSongProcessing = createServerFn({ method: 'POST' })
       jobId: z.uuid(),
       taskType: z.enum(['generate_xml_from_input', 'generate_voices_from_xml']),
       taskParams: z.object({ inputKey: z.string() }),
-    }),
+    })
   )
   .handler(async ({ data }) => {
     const { jobId, taskType, taskParams } = data

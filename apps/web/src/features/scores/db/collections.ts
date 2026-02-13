@@ -1,9 +1,6 @@
-import { FetchError } from '@electric-sql/client'
-import { electricCollectionOptions } from '@tanstack/electric-db-collection'
-import { createCollection } from '@tanstack/react-db'
-import { createServerFn } from '@tanstack/react-start'
 import { getTableName } from 'drizzle-orm'
-import { db } from '@/db'
+
+import { db, generateTxId } from '@repo/database'
 import {
   files,
   insertSongsSchema,
@@ -12,15 +9,21 @@ import {
   selectVoicesSchema,
   songs,
   voices,
-} from '@/features/scores/db/schema'
-import { generateTxId, syncEndpointUrl } from '@/lib/utils'
+} from '@repo/database'
+
+import { syncEndpointUrl } from '@/lib/utils'
+
+import { FetchError } from '@electric-sql/client'
+import { electricCollectionOptions } from '@tanstack/electric-db-collection'
+import { createCollection } from '@tanstack/react-db'
+import { createServerFn } from '@tanstack/react-start'
 
 export const addSong = createServerFn({
   method: 'POST',
 })
   .inputValidator(insertSongsSchema)
-  .handler(async (insertSong) => {
-    const result = await db.transaction(async (tx) => {
+  .handler(async insertSong => {
+    const result = await db.transaction(async tx => {
       const txid = await generateTxId(tx)
       const newItem = await tx
         .insert(songs)
@@ -41,7 +44,7 @@ export const songsCollection = createCollection(
       params: {
         table: getTableName(songs),
       },
-      onError: (error) => {
+      onError: error => {
         console.error('Stream error:', error)
         if (error instanceof FetchError && error.status >= 500) {
           return {} // Retry with same params
@@ -50,7 +53,7 @@ export const songsCollection = createCollection(
       },
     },
     schema: selectSongsSchema,
-    getKey: (item) => item.id,
+    getKey: item => item.id,
     onInsert: async ({ transaction }) => {
       // Ichh bin ein bisschen genervt, dass hier der Select Part genommen wird.
       // Es ergibt ja irgendwie auch sinn, aber irgendwie auch nicht.
@@ -64,7 +67,7 @@ export const songsCollection = createCollection(
 
       return { txid: result.txid }
     },
-  }),
+  })
 )
 
 export const filesCollection = createCollection(
@@ -75,7 +78,7 @@ export const filesCollection = createCollection(
       params: {
         table: getTableName(files),
       },
-      onError: (error) => {
+      onError: error => {
         console.error('Stream error:', error)
         if (error instanceof FetchError && error.status >= 500) {
           return {} // Retry with same params
@@ -84,8 +87,8 @@ export const filesCollection = createCollection(
       },
     },
     schema: selectFilesSchema,
-    getKey: (item) => item.id,
-  }),
+    getKey: item => item.id,
+  })
 )
 
 export const voicesCollection = createCollection(
@@ -96,7 +99,7 @@ export const voicesCollection = createCollection(
       params: {
         table: getTableName(voices),
       },
-      onError: (error) => {
+      onError: error => {
         console.error('Stream error:', error)
         if (error instanceof FetchError && error.status >= 500) {
           return {} // Retry with same params
@@ -105,6 +108,6 @@ export const voicesCollection = createCollection(
       },
     },
     schema: selectVoicesSchema,
-    getKey: (item) => item.id,
-  }),
+    getKey: item => item.id,
+  })
 )

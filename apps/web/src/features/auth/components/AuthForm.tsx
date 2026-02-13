@@ -1,15 +1,11 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
+
 import { useForm } from 'react-hook-form'
+
+import { type LoginInput, loginSchema, type RegisterInput, registerSchema } from '@repo/auth'
+
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Form,
   FormControl,
@@ -19,22 +15,13 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Tabs,
-  TabsContent,
-  TabsContents,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/motion-tabs'
+import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/ui/motion-tabs'
 import { authClient } from '@/features/auth/lib/auth-client'
-import {
-  type LoginInput,
-  loginSchema,
-  type RegisterInput,
-  registerSchema,
-} from '@/features/auth/lib/auth-schema'
 
-type AuthFormProps = {
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from '@tanstack/react-router'
+
+interface AuthFormProps {
   redirectTo: string | undefined
 }
 
@@ -65,7 +52,7 @@ export function AuthForm({ redirectTo }: AuthFormProps) {
             if (!redirectTo) navigate({ to: '/' })
             navigate({ to: redirectTo })
           },
-          onError: (ctx) => {
+          onError: ctx => {
             // Hier Fehlerbehandlung, z.B. Toast
             console.error(ctx.error.message)
             loginForm.setError('root', { message: ctx.error.message })
@@ -88,7 +75,7 @@ export function AuthForm({ redirectTo }: AuthFormProps) {
           onSuccess: () => {
             navigate({ to: redirectTo })
           },
-          onError: (ctx) => {
+          onError: ctx => {
             console.error(ctx.error.message)
             registerForm.setError('root', { message: ctx.error.message })
           },
@@ -113,16 +100,11 @@ export function AuthForm({ redirectTo }: AuthFormProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Willkommen zurück</CardTitle>
-                <CardDescription>
-                  Melde dich mit deiner E-Mail an.
-                </CardDescription>
+                <CardDescription>Melde dich mit deiner E-Mail an.</CardDescription>
               </CardHeader>
               <CardContent>
                 <Form {...loginForm}>
-                  <form
-                    onSubmit={loginForm.handleSubmit(onLogin)}
-                    className='space-y-4'
-                  >
+                  <form onSubmit={loginForm.handleSubmit(onLogin)} className='space-y-4'>
                     <FormField
                       control={loginForm.control}
                       name='email'
@@ -154,11 +136,7 @@ export function AuthForm({ redirectTo }: AuthFormProps) {
                         {loginForm.formState.errors.root.message}
                       </div>
                     )}
-                    <Button
-                      className='w-full'
-                      type='submit'
-                      disabled={isLoading}
-                    >
+                    <Button className='w-full' type='submit' disabled={isLoading}>
                       {isLoading ? 'Lädt...' : 'Anmelden'}
                     </Button>
                   </form>
@@ -172,16 +150,11 @@ export function AuthForm({ redirectTo }: AuthFormProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Konto erstellen</CardTitle>
-                <CardDescription>
-                  Gib deine Daten ein, um loszulegen.
-                </CardDescription>
+                <CardDescription>Gib deine Daten ein, um loszulegen.</CardDescription>
               </CardHeader>
               <CardContent>
                 <Form {...registerForm}>
-                  <form
-                    onSubmit={registerForm.handleSubmit(onRegister)}
-                    className='space-y-4'
-                  >
+                  <form onSubmit={registerForm.handleSubmit(onRegister)} className='space-y-4'>
                     <FormField
                       control={registerForm.control}
                       name='name'
@@ -226,11 +199,7 @@ export function AuthForm({ redirectTo }: AuthFormProps) {
                         {registerForm.formState.errors.root.message}
                       </div>
                     )}
-                    <Button
-                      className='w-full'
-                      type='submit'
-                      disabled={isLoading}
-                    >
+                    <Button className='w-full' type='submit' disabled={isLoading}>
                       {isLoading ? 'Erstellen...' : 'Registrieren'}
                     </Button>
                   </form>

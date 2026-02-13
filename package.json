@@ -1,0 +1,46 @@
+{
+  "name": "softchor",
+  "private": true,
+  "version": "1.0.0",
+  "description": "SoftChor (Software für den Chor) - Monorepo with Turborepo",
+  "packageManager": "pnpm@10.29.3",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "turbo run format",
+    "format:fix": "turbo run format:fix",
+    "check": "turbo run check",
+    "typecheck": "turbo run typecheck",
+    "db:generate": "turbo run db:generate --filter @repo/database",
+    "db:migrate": "turbo run db:migrate --filter @repo/database",
+    "db:push": "turbo run db:push --filter @repo/database",
+    "db:pull": "turbo run db:pull --filter @repo/database",
+    "db:studio": "turbo run db:studio --filter @repo/database",
+    "db:models": "turbo run generate:models --filter @repo/database",
+    "services:up": "docker compose --env-file .env.local -f services/docker-compose.dev.yaml up",
+    "services:down": "docker compose --env-file .env.local -f services/docker-compose.dev.yaml down"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/prettier-config": "workspace:*",
+    "eslint": "^9.15.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-n": "^17.23.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "prettier": "^3.8.1",
+    "turbo": "^2.8.7",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.55.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

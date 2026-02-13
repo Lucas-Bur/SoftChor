@@ -1,4 +1,4 @@
-import { type SyncableTable, TABLE_REGISTRY } from '@/db/schema'
+import { type SyncableTable, TABLE_REGISTRY } from '@repo/database'
 
 export type AllowedTable = SyncableTable
 

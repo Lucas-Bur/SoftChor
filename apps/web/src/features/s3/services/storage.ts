@@ -1,18 +1,16 @@
-import {
-  DeleteObjectCommand,
-  GetObjectCommand,
-  PutObjectCommand,
-} from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { v7 as uuidv7 } from 'uuid'
-import z from 'zod'
-import { db } from '@/db'
+import { z } from 'zod'
+
+import { db, generateTxId } from '@repo/database'
+import { files as filesTable } from '@repo/database'
+import { bucketName, s3Client } from '@repo/storage'
+
 import { authMiddleware } from '@/features/auth/middleware/auth'
-import { bucketName, s3Client } from '@/features/s3/lib/client'
-import { files as filesTable } from '@/features/scores/db/schema'
-import { generateTxId } from '@/lib/utils'
+
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { createServerFn } from '@tanstack/react-start'
 
 const generateKey = (file: File): string => {
   const uuidV7 = uuidv7() // uuidv7 ist eine aktive Entscheidung von mir für die Zeit
@@ -20,7 +18,7 @@ const generateKey = (file: File): string => {
 }
 
 const uploadFile = async ({ file, key }: { file: File; key?: string }) => {
-  const finalKey = key || generateKey(file)
+  const finalKey = key ?? generateKey(file)
 
   const command = new PutObjectCommand({
     Bucket: bucketName,
@@ -86,10 +84,10 @@ export const getPresignedUrlsFromKeys = createServerFn({ method: 'GET' })
   .middleware([authMiddleware])
   .handler(async ({ data: { keys } }) => {
     const urls = await Promise.all(
-      keys.map(async (key) => {
+      keys.map(async key => {
         const url = await getPresignedUrl({ key })
         return { key, url }
-      }),
+      })
     )
     return urls
   })
@@ -114,8 +112,8 @@ export const deleteFileFromDbFn = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ id: z.string() }))
   .middleware([authMiddleware])
   .handler(async ({ data: { id } }) => {
-    await db.transaction(async (tx) => {
-      const txid = await generateTxId(tx)
+    await db.transaction(async tx => {
+      await generateTxId(tx)
       await tx.delete(filesTable).where(eq(filesTable.id, id))
     })
     return { success: true }

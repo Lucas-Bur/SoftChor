@@ -1,5 +1,6 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { getSessionServerFn } from '@/features/auth/lib/auth-server'
+
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated')({
   component: AuthenticatedLayout,

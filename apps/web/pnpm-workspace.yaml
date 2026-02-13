@@ -1,4 +1,0 @@
-onlyBuiltDependencies:
-  - bufferutil
-  - core-js
-  - esbuild

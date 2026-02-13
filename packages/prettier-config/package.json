@@ -1,0 +1,16 @@
+{
+  "name": "@repo/prettier-config",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "peerDependencies": {
+    "prettier": "^3.0.0"
+  }
+}

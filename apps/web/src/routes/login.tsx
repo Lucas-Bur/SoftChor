@@ -1,7 +1,9 @@
-import { createFileRoute, useSearch } from '@tanstack/react-router'
-import z from 'zod'
+import { z } from 'zod'
+
 import { AuthForm } from '@/features/auth/components/AuthForm'
 import { guestMiddleware } from '@/features/auth/middleware/auth'
+
+import { createFileRoute, useSearch } from '@tanstack/react-router'
 
 const loginSearchSchema = z.object({
   redirect: z.string().optional(),

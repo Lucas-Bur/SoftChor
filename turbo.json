@@ -1,0 +1,134 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "globalEnv": ["NODE_ENV"],
+  "globalDependencies": [".env", ".env.local"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env",
+        ".env.local",
+        ".env.production",
+        ".env.production.local"
+      ],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "build/**"],
+      "env": [
+        "DATABASE_URL",
+        "ELECTRIC_SECRET",
+        "BETTER_AUTH_SECRET",
+        "BETTER_AUTH_URL",
+        "AMQP_URL",
+        "S3_ENDPOINT",
+        "S3_REGION",
+        "S3_ACCESS_KEY_ID",
+        "S3_SECRET_ACCESS_KEY",
+        "S3_BUCKET_NAME"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env.local",
+        ".env.development.local",
+        ".env.development",
+        ".env"
+      ],
+      "env": [
+        "DATABASE_URL",
+        "ELECTRIC_SECRET",
+        "BETTER_AUTH_SECRET",
+        "BETTER_AUTH_URL",
+        "AMQP_URL",
+        "S3_ENDPOINT",
+        "S3_REGION",
+        "S3_ACCESS_KEY_ID",
+        "S3_SECRET_ACCESS_KEY",
+        "S3_BUCKET_NAME"
+      ]
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        ".eslintrc.cjs",
+        "eslint.config.*",
+        "../eslint-config/**"
+      ],
+      "outputs": []
+    },
+    "lint:fix": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        ".eslintrc.cjs",
+        "eslint.config.*",
+        "../eslint-config/**"
+      ],
+      "outputs": []
+    },
+    "format": {
+      "cache": false,
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        ".prettierrc*",
+        "prettier.config.*",
+        "../prettier-config/**"
+      ],
+      "outputs": []
+    },
+    "format:fix": {
+      "cache": false,
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        ".prettierrc*",
+        "prettier.config.*",
+        "../prettier-config/**"
+      ],
+      "outputs": []
+    },
+    "check": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        ".eslintrc.cjs",
+        "eslint.config.*",
+        ".prettierrc*",
+        "prettier.config.*",
+        "../eslint-config/**",
+        "../prettier-config/**"
+      ],
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.ts", "src/**/*.tsx", "tsconfig.json", "../typescript-config/**"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "src/**/*.test.ts",
+        "src/**/*.test.tsx",
+        "src/**/*.spec.ts",
+        "src/**/*.spec.tsx"
+      ],
+      "outputs": ["coverage/**"]
+    },
+    "generate:models": {
+      "inputs": ["src/schema/**/*.ts", "scripts/generate-models.ts"],
+      "outputs": ["generated/**"]
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}

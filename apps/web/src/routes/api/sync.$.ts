@@ -1,10 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { auth } from '@/features/auth/lib/auth-server' // Dein Auth Server Import
+import { getSession } from '@repo/auth'
+
 import { isAllowedTable } from '@/features/sync/lib/electric-helpers'
-import {
-  prepareElectricUrl,
-  proxyElectricRequest,
-} from '@/features/sync/lib/electric-proxy'
+import { prepareElectricUrl, proxyElectricRequest } from '@/features/sync/lib/electric-proxy'
+
+import { createFileRoute } from '@tanstack/react-router'
 
 // Ein paar Anmerkungen zu diesem Part. Per Default ist Electric SQL Public.
 // Dementsprechend ist es unsere Aufgabe den korrekten Zugriff auf die gewollten
@@ -24,7 +23,7 @@ import {
 
 const serve = async ({ request }: { request: Request }) => {
   // 1. Auth Check (Optional aber empfohlen)
-  const session = await auth.api.getSession({ headers: request.headers })
+  const session = await getSession(request.headers)
   if (!session) return new Response('Unauthorized', { status: 401 })
 
   const url = new URL(request.url)
@@ -32,13 +31,10 @@ const serve = async ({ request }: { request: Request }) => {
 
   // 2. Security: Tabellen-Whitelist Check
   if (!table || !isAllowedTable(table)) {
-    return new Response(
-      JSON.stringify({ error: 'Table not allowed or missing' }),
-      {
-        status: 403,
-        headers: { 'content-type': 'application/json' },
-      },
-    )
+    return new Response(JSON.stringify({ error: 'Table not allowed or missing' }), {
+      status: 403,
+      headers: { 'content-type': 'application/json' },
+    })
   }
 
   // 3. Proxy Request vorbereiten
