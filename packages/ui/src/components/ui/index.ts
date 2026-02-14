@@ -45,21 +45,6 @@ export {
 export { Input } from './input'
 export { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from './input-group'
 export { Label } from './label'
-export { MotionHighlight, MotionHighlightItem } from './motion-highlight'
-export {
-  Tabs as MotionTabs,
-  TabsContent as MotionTabsContent,
-  TabsContents as MotionTabsContents,
-  TabsList as MotionTabsList,
-  TabsTrigger as MotionTabsTrigger,
-  type TabsContentProps,
-  type TabsContentsProps,
-  type TabsContextType,
-  type TabsListProps,
-  type TabsProps,
-  type TabsTriggerProps,
-  useTabs,
-} from './motion-tabs'
 export { Progress } from './progress'
 export { ScrollArea, ScrollBar } from './scroll-area'
 export {

@@ -5,3 +5,6 @@ export { cn } from './lib/utils'
 
 // Export all UI components
 export * from './components/ui'
+
+// Export motion components
+export * from './components/motion'

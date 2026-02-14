@@ -1,4 +1,4 @@
-import { Layers } from 'lucide-react'
+import { Music2 } from 'lucide-react'
 
 import { UserMenu } from '@/features/auth/components/UserMenu'
 
@@ -14,10 +14,10 @@ export function Header() {
         <div className='mr-4 flex'>
           <Link to='/' className='mr-6 flex items-center space-x-2'>
             <div className='bg-primary/10 p-1 rounded-md'>
-              <Layers className='h-6 w-6 text-primary' />
+              <Music2 className='h-6 w-6 text-primary' />
             </div>
             <span className='hidden font-bold sm:inline-block tracking-tight text-lg'>
-              Good<span className='text-primary'>Sync</span>
+              Soft<span className='text-primary'>Chor</span>
             </span>
           </Link>
 

@@ -5,7 +5,7 @@ import * as React from 'react'
 import { type HTMLMotionProps, motion, type Transition } from 'motion/react'
 
 import { cn } from '../../lib/utils'
-import { MotionHighlight, MotionHighlightItem } from './motion-highlight'
+import { MotionHighlight, MotionHighlightItem } from './highlight'
 
 interface TabsContextType<T extends string> {
   activeValue: T

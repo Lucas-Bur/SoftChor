@@ -3,32 +3,16 @@
 @import '@repo/ui/styles.css';
 
 @theme inline {
-  /* Custom Animations für Data Flow */
+  /* Custom Animations */
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  --animate-float: float 6s ease-in-out infinite;
-
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
 }
 
 @layer base {
   body {
     @apply bg-background text-foreground antialiased selection:bg-cyan-500/30;
-    /* Subtiles Grid Pattern im Hintergrund */
-    background-image:
-      linear-gradient(to right, rgba(128, 128, 128, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(128, 128, 128, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
   }
 
-  /* Scrollbar Styling für Data Aesthetic */
+  /* Scrollbar Styling */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;

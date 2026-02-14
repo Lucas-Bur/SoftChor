@@ -1,0 +1,7 @@
+# Generated files
+routeTree.gen.ts
+*.gen.ts
+
+# Build outputs
+.output
+.tanstack

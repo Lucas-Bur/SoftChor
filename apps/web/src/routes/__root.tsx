@@ -9,7 +9,12 @@ import appCss from '../styles.css?url'
 import type { QueryClient } from '@tanstack/react-query'
 
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import { createRootRouteWithContext, HeadContent, Scripts } from '@tanstack/react-router'
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Scripts,
+  useLocation,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
 export interface MyRouterContext {
@@ -27,7 +32,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'GoodSync',
+        title: 'SoftChor - Chorpartituren intelligenter verwaltet',
+      },
+      {
+        name: 'description',
+        content:
+          'Laden, erkennen, extrahieren. SoftChor verarbeitet deine Noten automatisch und trennt Stimmen auf einen Klick.',
       },
     ],
     links: [
@@ -35,14 +45,30 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         rel: 'stylesheet',
         href: appCss,
       },
+      {
+        rel: 'preconnect',
+        href: 'https://fonts.googleapis.com',
+      },
+      {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossOrigin: 'anonymous',
+      },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap',
+      },
     ],
   }),
   shellComponent: RootDocument,
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const location = useLocation()
+  const isLandingPage = location.pathname === '/'
+
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html lang='de' suppressHydrationWarning>
       <head>
         <HeadContent />
         <script
@@ -91,7 +117,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ThemeProvider>
-          <Header />
+          {!isLandingPage && <Header />}
           {children}
           <Toaster />
           <TanStackDevtools
