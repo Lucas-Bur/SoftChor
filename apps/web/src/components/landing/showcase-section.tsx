@@ -42,7 +42,7 @@ export function ShowcaseSection() {
               >
                 {/* Mockup placeholder */}
                 <div
-                  className={`aspect-video rounded-2xl border border-landing-border bg-gradient-to-br from-muted/50 to-background/30 flex items-center justify-center ${index % 2 === 1 ? 'md:order-2' : ''}`}
+                  className={`aspect-video rounded-2xl border border-landing-border bg-linear-to-br from-muted/50 to-background/30 flex items-center justify-center ${index % 2 === 1 ? 'md:order-2' : ''}`}
                 >
                   <div className='text-center p-8'>
                     <div className='w-16 h-16 mx-auto mb-4 rounded-xl bg-landing-accent/10 flex items-center justify-center'>

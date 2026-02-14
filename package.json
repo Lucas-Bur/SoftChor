@@ -23,24 +23,33 @@
     "services:up": "docker compose --env-file .env.local -f services/docker-compose.dev.yaml up",
     "services:down": "docker compose --env-file .env.local -f services/docker-compose.dev.yaml down"
   },
+  "dependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
   "devDependencies": {
-    "@eslint/js": "^9.15.0",
+    "@eslint/js": "catalog:",
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
-    "eslint": "^9.15.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-n": "^17.23.2",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
-    "prettier": "^3.8.1",
-    "turbo": "^2.8.7",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.55.0"
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-jsx-a11y": "catalog:",
+    "eslint-plugin-n": "catalog:",
+    "eslint-plugin-react": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "eslint-plugin-simple-import-sort": "catalog:",
+    "prettier": "catalog:",
+    "turbo": "^2.8.8",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   },
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"
+  },
+  "pnpm": {
+    "resolvePeersFromWorkspaceRoot": true
   }
 }

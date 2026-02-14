@@ -25,24 +25,24 @@
     "generate:models": "tsx scripts/generate-models.ts"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
-    "@tanstack/electric-db-collection": "^0.2.15",
-    "drizzle-orm": "^0.45.1",
+    "@neondatabase/serverless": "catalog:",
+    "@tanstack/electric-db-collection": "catalog:",
+    "drizzle-orm": "catalog:",
     "drizzle-zod": "^0.8.3",
     "pg": "^8.16.3",
     "ws": "^8.18.3",
-    "zod": "^4.2.1"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^25.0.3",
-    "@types/pg": "^8.16.0",
-    "@types/ws": "^8.18.1",
+    "@types/node": "catalog:",
+    "@types/pg": "catalog:",
+    "@types/ws": "catalog:",
     "drizzle-kit": "^0.31.8",
-    "ts-morph": "^27.0.2",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "ts-morph": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
   }
 }

@@ -30,7 +30,7 @@ const config = defineConfig({
   },
   plugins: [
     devtools(),
-    nitro(),
+    // nitro(),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
@@ -43,6 +43,26 @@ const config = defineConfig({
       },
     }),
   ],
+  ssr: {
+    noExternal: [
+      '@tanstack/start-server-core',
+      '@tanstack/start-storage-context',
+      '@tanstack/router-core',
+      '@tanstack/react-router',
+      '@tanstack/react-router-ssr-query',
+    ],
+    external: ['node:async_hooks', 'node:stream', 'node:stream/web'],
+  },
+
+  optimizeDeps: {
+    exclude: ['node:async_hooks', 'node:stream', 'node:stream/web'],
+  },
+
+  build: {
+    rollupOptions: {
+      external: ['node:async_hooks', 'node:stream', 'node:stream/web'],
+    },
+  },
 })
 
 export default config

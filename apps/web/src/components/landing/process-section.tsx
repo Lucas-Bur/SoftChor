@@ -47,7 +47,7 @@ export function ProcessSection() {
         {/* Timeline */}
         <div className='relative'>
           {/* Connection line */}
-          <div className='absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-landing-border to-transparent -translate-y-1/2 hidden md:block' />
+          <div className='absolute top-1/2 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-landing-border to-transparent -translate-y-1/2 hidden md:block' />
 
           {/* Steps */}
           <div className='grid md:grid-cols-4 gap-6 md:gap-4'>

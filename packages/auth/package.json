@@ -16,17 +16,17 @@
     "check": "npm run lint && npm run format"
   },
   "dependencies": {
-    "better-auth": "^1.4.7",
-    "@neondatabase/serverless": "^1.0.2",
-    "drizzle-orm": "^0.45.1",
-    "zod": "^4.2.1",
+    "better-auth": "catalog:",
+    "@neondatabase/serverless": "catalog:",
+    "drizzle-orm": "catalog:",
+    "zod": "catalog:",
     "@repo/database": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^25.0.3",
-    "typescript": "^5.9.3"
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
   }
 }
