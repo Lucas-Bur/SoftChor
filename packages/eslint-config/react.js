@@ -9,11 +9,11 @@
 import prettierConfig from 'eslint-config-prettier'
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y'
 import reactPlugin from 'eslint-plugin-react'
+import { defineConfig } from 'eslint/config'
 import reactHooksPlugin from 'eslint-plugin-react-hooks'
-import tseslint from 'typescript-eslint'
 import baseConfig from './index.js'
 
-export default tseslint.config(
+export default defineConfig(
   ...baseConfig,
   // React Hooks recommended config (includes compiler-powered linting)
   reactHooksPlugin.configs.flat.recommended,

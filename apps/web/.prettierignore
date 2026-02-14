@@ -1,7 +1,60 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+build
+.next
+.turbo
+coverage
+
 # Generated files
 routeTree.gen.ts
 *.gen.ts
 
-# Build outputs
+# Output directories
 .output
 .tanstack
+
+# Lock files
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Binary files
+*.min.js
+*.min.css
+*.woff
+*.woff2
+*.ttf
+*.eot
+*.ico
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+
+# Minified files
+*.min.js
+*.min.css
+*.min.html
+
+# Database migrations
+migrations/
+*.sql

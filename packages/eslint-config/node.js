@@ -5,10 +5,10 @@
 
 import prettierConfig from 'eslint-config-prettier'
 import nPlugin from 'eslint-plugin-n'
-import tseslint from 'typescript-eslint'
 import baseConfig from './index.js'
+import { defineConfig } from 'eslint/config'
 
-export default tseslint.config(
+export default defineConfig(
   ...baseConfig,
   {
     name: 'softchor/node',

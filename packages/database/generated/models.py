@@ -55,26 +55,6 @@ class Verifications(BaseModel):
     class Config:
         from_attributes = True
 
-class Users(BaseModel):
-    id: Optional[int] = None
-    name: str
-    age: int
-    email: str
-
-    class Config:
-        from_attributes = True
-
-class Posts(BaseModel):
-    id: Optional[int] = None
-    title: str
-    content: str
-    userId: int
-    createdAt: str = None
-    updatedAt: str
-
-    class Config:
-        from_attributes = True
-
 class Songs(BaseModel):
     id: Optional[str] = None
     title: str

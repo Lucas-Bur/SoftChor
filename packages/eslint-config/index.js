@@ -25,6 +25,7 @@ export default [
       '**/*.config.ts',
       '**/routeTree.gen.ts',
       '**/pnpm-lock.yaml',
+      '**/.output/**',
     ],
   },
   // Base ESLint recommended rules
