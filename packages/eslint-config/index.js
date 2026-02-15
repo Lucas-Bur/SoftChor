@@ -6,6 +6,7 @@
 import eslint from '@eslint/js'
 import prettierConfig from 'eslint-config-prettier'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
+import turboPlugin from 'eslint-plugin-turbo'
 import tseslint from 'typescript-eslint'
 
 // Get the TypeScript recommended configs
@@ -39,8 +40,14 @@ export default [
     name: 'softchor/base',
     plugins: {
       'simple-import-sort': simpleImportSort,
+      turbo: turboPlugin,
     },
     rules: {
+      // ===== Turborepo Rules =====
+      // Automatically flag env vars missing from turbo.json
+      // https://turborepo.dev/docs/crafting-your-repository/using-environment-variables
+      'turbo/no-undeclared-env-vars': 'error',
+
       // ===== TypeScript ESLint Rules =====
       // Biome: noUnusedVariables
       '@typescript-eslint/no-unused-vars': [
