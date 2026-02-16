@@ -7,13 +7,15 @@ import { motion } from 'motion/react'
 
 import { Button } from '@repo/ui'
 
+import { BassClef, TrebleClef } from '../clefs'
+
 import { Link } from '@tanstack/react-router'
 
 // Music staff lines background with clefs
 function StaffLines() {
   return (
     <div className='absolute inset-0 w-full h-full overflow-hidden opacity-[0.05] dark:opacity-[0.05]'>
-      <svg className='absolute w-full h-full' preserveAspectRatio='none' viewBox='0 0 1000 800'>
+      <svg className='absolute w-full h-full'>
         {/* Multiple staves spanning the full height */}
         {[0, 1, 2, 3, 4, 5].map(staffIndex => {
           const baseY = 50 + staffIndex * 135 + (staffIndex % 2) * -45
@@ -26,21 +28,21 @@ function StaffLines() {
                   key={`staff-${staffIndex}-line-${lineIndex}`}
                   x1='0'
                   y1={baseY + lineIndex * 12}
-                  x2='1000'
+                  x2='100%'
                   y2={baseY + lineIndex * 12}
                   stroke='currentColor'
-                  strokeWidth='1'
+                  strokeWidth='1.5'
                 />
               ))}
               {/* Clef at the beginning */}
               {isTreble ? (
-                <text x='20' y={baseY + 40} fontSize='60' fill='currentColor' fontFamily='serif'>
-                  𝄞
-                </text>
+                <foreignObject x='15' y={baseY - 15} width='50' height='80'>
+                  <TrebleClef className='w-full h-full text-current' />
+                </foreignObject>
               ) : (
-                <text x='20' y={baseY + 34} fontSize='50' fill='currentColor' fontFamily='serif'>
-                  𝄢
-                </text>
+                <foreignObject x='15' y={baseY - 3} width='50' height='55'>
+                  <BassClef className='w-full h-full text-current' />
+                </foreignObject>
               )}
             </g>
           )
