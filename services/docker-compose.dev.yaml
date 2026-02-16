@@ -1,14 +1,14 @@
 services:
-  electric:
-    image: electricsql/electric:latest
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      ELECTRIC_SECRET: ${ELECTRIC_SECRET}
-      ELECTRIC_USAGE_REPORTING: false
-    ports:
-      - 30000:3000
-    volumes:
-      - electric_data:/var/lib/electric/persistent
+  # electric:
+  #   image: electricsql/electric:latest
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL}
+  #     ELECTRIC_SECRET: ${ELECTRIC_SECRET}
+  #     ELECTRIC_USAGE_REPORTING: false
+  #   ports:
+  #     - 30000:3000
+  #   volumes:
+  #     - electric_data:/var/lib/electric/persistent
 
   minio:
     image: minio/minio:latest
