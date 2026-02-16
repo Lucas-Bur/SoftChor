@@ -34,7 +34,7 @@ import { enqueueSongProcessing } from '@/features/queue/services/queue'
 import {
   deleteFileFn,
   deleteFileFromDbFn,
-  getPresignedUrlsFromKeys,
+  getPresignedUrlsFn,
 } from '@/features/s3/services/storage'
 import { FileUploadDialog } from '@/features/scores/components/FileUploadDialog'
 import { StatusBadge } from '@/features/scores/components/StatusBadge'
@@ -165,7 +165,7 @@ export function SongDetail() {
 
   const handleDownload = async (file: SongFile) => {
     try {
-      const urls = await getPresignedUrlsFromKeys({
+      const urls = await getPresignedUrlsFn({
         data: { keys: [file.s3Key] },
       })
       const url = urls.find(u => u.key === file.s3Key)?.url

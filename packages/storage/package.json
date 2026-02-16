@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",
-    "@aws-sdk/s3-request-presigner": "catalog:"
+    "@aws-sdk/s3-request-presigner": "catalog:",
+    "uuid": "catalog:"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

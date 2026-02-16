@@ -109,3 +109,6 @@ catalogs:
     # Build utilities
     ts-morph: '^27.0.2'
     tsx: '^4.21.0'
+
+    # UUID
+    uuid: '^13.0.0'

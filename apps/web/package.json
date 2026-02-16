@@ -50,7 +50,7 @@
     "tailwindcss-animate": "catalog:",
     "tailwindcss": "catalog:",
     "tw-animate-css": "catalog:",
-    "uuid": "^13.0.0",
+    "uuid": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
