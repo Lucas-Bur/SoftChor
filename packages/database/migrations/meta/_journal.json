@@ -57,6 +57,13 @@
       "when": 1769306857903,
       "tag": "0007_ambiguous_spectrum",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1771274796112,
+      "tag": "0008_smiling_pretty_boy",
+      "breakpoints": true
     }
   ]
 }
