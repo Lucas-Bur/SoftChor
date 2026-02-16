@@ -1,7 +1,5 @@
 import { getSession } from '@repo/auth'
-
-import { isAllowedTable } from '@/features/sync/lib/electric-helpers'
-import { prepareElectricUrl, proxyElectricRequest } from '@/features/sync/lib/electric-proxy'
+import { isAllowedTable, prepareElectricUrl, proxyElectricRequest } from '@repo/sync'
 
 import { createFileRoute } from '@tanstack/react-router'
 

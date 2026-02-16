@@ -20,7 +20,8 @@
     "react": "catalog:"
   },
   "dependencies": {
-    "@electric-sql/client": "catalog:"
+    "@electric-sql/client": "catalog:",
+    "@repo/database": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

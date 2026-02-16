@@ -8,11 +8,7 @@ import { ELECTRIC_PROTOCOL_QUERY_PARAMS } from '@electric-sql/client'
  */
 export function prepareElectricUrl(requestUrl: string): URL {
   const url = new URL(requestUrl)
-  const electricUrl =
-    process.env.NODE_ENV === `production`
-      ? `https://api.electric-sql.cloud`
-      : `http://localhost:30000`
-  const originUrl = new URL(`${electricUrl}/v1/shape`)
+  const originUrl = new URL(`https://api.electric-sql.cloud/v1/shape`)
 
   // Copy Electric-specific query params
   url.searchParams.forEach((value, key) => {
@@ -23,7 +19,11 @@ export function prepareElectricUrl(requestUrl: string): URL {
 
   // Add Electric Cloud authentication if configured
   if (process.env.ELECTRIC_SECRET) {
-    originUrl.searchParams.set(`secret`, process.env.ELECTRIC_SECRET)
+    originUrl.searchParams.set(`source_secret`, process.env.ELECTRIC_SECRET)
+  }
+
+  if (process.env.ELECTRIC_SOURCE_ID) {
+    originUrl.searchParams.set(`source_id`, process.env.ELECTRIC_SOURCE_ID)
   }
 
   return originUrl

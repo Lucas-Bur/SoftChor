@@ -16,6 +16,7 @@
       "env": [
         "DATABASE_URL",
         "ELECTRIC_SECRET",
+        "ELECTRIC_SOURCE_ID",
         "BETTER_AUTH_SECRET",
         "BETTER_AUTH_URL",
         "AMQP_URL",
@@ -40,6 +41,7 @@
       "env": [
         "DATABASE_URL",
         "ELECTRIC_SECRET",
+        "ELECTRIC_SOURCE_ID",
         "BETTER_AUTH_SECRET",
         "BETTER_AUTH_URL",
         "AMQP_URL",

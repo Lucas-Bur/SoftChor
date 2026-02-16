@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm'
+import { getTableName, relations } from 'drizzle-orm'
 import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 
 export const users = pgTable('users', {
@@ -92,4 +92,4 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
   }),
 }))
 
-export const authSync = [users] as const
+export const authSync = { [getTableName(users)]: users } as const

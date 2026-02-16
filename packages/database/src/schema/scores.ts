@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm'
+import { getTableName, sql } from 'drizzle-orm'
 import {
   bigint,
   index,
@@ -90,4 +90,8 @@ export const SONG_VOICE = voiceTypeEnum.enumValues
 export const SONG_FILE = fileTypeEnum.enumValues
 export const SONG_STATUS = jobStatusEnum.enumValues
 
-export const scoresSync = [songs, files, voices] as const
+export const scoresSync = {
+  [getTableName(songs)]: songs,
+  [getTableName(files)]: files,
+  [getTableName(voices)]: voices,
+} as const
